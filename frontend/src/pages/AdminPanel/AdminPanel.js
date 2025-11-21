@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, Tabs, Tab } from '@mui/material';
+import { Box, Typography, Tabs, Tab, CircularProgress } from '@mui/material';
 import UsersTab from './UsersTab/UsersTab';
 import ProgressTab from './ProgressTab/ProgressTab';
 import { getUsers } from '../../api/auth';
@@ -17,9 +17,11 @@ const AdminPanel = () => {
     severity: 'success'
   });
   const [updated, setUpdated] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setUpdated(false);
+    setLoading(true);
 
     const fetchData = async () => {
       try {
@@ -33,7 +35,9 @@ const AdminPanel = () => {
         setUserProgress(progressData);
       } catch (error) {
         handleError('Ошибка загрузки данных', error);
-      }
+      } finally {
+        setLoading(false);
+      };
     };
     fetchData();
   }, [updated]);
@@ -60,6 +64,24 @@ const AdminPanel = () => {
     setTabValue(newValue);
   };
 
+  const LoadingSpinner = () => (
+    <Box 
+      sx={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        height: '400px',
+        flexDirection: 'column',
+        gap: 2
+      }}
+    >
+      <CircularProgress size={60} />
+      <Typography variant="h6" color="text.secondary">
+        Загрузка данных...
+      </Typography>
+    </Box>
+  );
+
   return (
     <Box sx={{ p: 3 }}>
       <Typography variant="h4" gutterBottom>
@@ -67,21 +89,27 @@ const AdminPanel = () => {
       </Typography>
       
       <Tabs value={tabValue} onChange={handleTabChange}>
-        <Tab label="Пользователи" />
-        <Tab label="Прогресс курсов" />
+        <Tab label="Назначение курсов" />
+        <Tab label="Прогресс пользователей" />
       </Tabs>
       
-      {tabValue === 0 && (
-        <UsersTab 
-          users={users} 
-          courses={courses} 
-          onError={handleError}
-          onSuccess={handleSuccess}
-        />
-      )}
-      
-      {tabValue === 1 && (
-        <ProgressTab progressData={userProgress} />
+      {loading ? (
+        <LoadingSpinner />
+      ) : (
+        <>
+          {tabValue === 0 && (
+            <UsersTab 
+              users={users} 
+              courses={courses} 
+              onError={handleError}
+              onSuccess={handleSuccess}
+            />
+          )}
+          
+          {tabValue === 1 && (
+            <ProgressTab progressData={userProgress} />
+          )}
+        </>
       )}
       
       <Notification 
