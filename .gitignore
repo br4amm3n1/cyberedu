@@ -1,10 +1,2 @@
 .env
 backend/.env
-backend/documents/__pycache__/
-backend/documents/migrations/
-backend/cyber_edu/__pycache__/
-backend/accounts/__pycache__/
-backend/accounts/migrations/
-backend/courses/__pycache__/
-backend/courses/migrations/
-
