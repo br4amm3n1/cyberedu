@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Новый курс для прохождения</title>
+</head>
+<body>
+    <h2>Здравствуйте, {{ user.first_name }} {{ user.last_name }}!</h2>
+    
+    <p>Вам был добавлен новый курс для прохождения: <strong>{{ course.title }}</strong></p>
+    
+    <p><strong>Описание курса:</strong><br>
+    {{ course.description }}</p>
+    
+    <p><strong>Категория:</strong> {{ course.get_category_display }}</p>
+    <p><strong>Сложность:</strong> {{ course.difficulty }}</p>
+    <p><strong>Автор:</strong> {{ course.author }}</p>
+    
+    <p>Вы можете начать прохождение курса в любое удобное время в вашем личном кабинете.</p>
+    
+    <hr>
+    
+    <p>С уважением,<br>
+    Команда платформы обучения кибербезопасности ТНИМЦ CyberSec</p>
+    
+    <p><small>Это письмо отправлено автоматически, пожалуйста, не отвечайте на него.</small></p>
+</body>
+</html>

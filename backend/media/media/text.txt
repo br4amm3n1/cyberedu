@@ -1,0 +1,75 @@
+class TestViewSet(viewsets.ModelViewSet):
+    serializer_class = TestSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        queryset = Test.objects.all().prefetch_related('questions')
+        course_id = self.request.query_params.get('course_id')
+        if course_id:
+            queryset = queryset.filter(course_id=course_id)
+        return queryset
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+class QuestionViewSet(viewsets.ModelViewSet):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        test_id = self.request.query_params.get('test_id')
+        if test_id:
+            return self.queryset.filter(test_id=test_id)
+        return self.queryset
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+class AnswerOptionViewSet(viewsets.ModelViewSet):
+    queryset = AnswerOption.objects.all()
+    serializer_class = AnswerOptionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        question_id = self.request.query_params.get('question_id')
+        if question_id:
+            return self.queryset.filter(question_id=question_id)
+        return self.queryset
+    
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        question_id = request.query_params.get('question_id')
+        if question_id:
+            try:
+                question = Question.objects.get(pk=question_id)
+                serializer = self.get_serializer(queryset, many=True)
+                response_data = {
+                    'question': {
+                        'id': question.id,
+                        'text': question.text,
+                        'type': question.question_type,
+                        'points': question.points
+                    },
+                    'options': serializer.data
+                }
+                return Response(response_data)
+            except Question.DoesNotExist:
+                return Response(
+                    {'error': 'Question not found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)

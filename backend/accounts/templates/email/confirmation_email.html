@@ -1,0 +1,15 @@
+<!-- templates/email/confirmation_email.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Подтверждение email</title>
+</head>
+<body>
+    <p>Здравствуйте, {{ user.first_name }} {{ user.last_name }}!</p>
+    <p>Вы регистрируетесь на платформе обучения кибербезопасности ТНИМЦ CyberSec.</p>
+    <p>Пожалуйста, подтвердите ваш email, перейдя по ссылке:</p>
+    <p><a href="{{ confirmation_link }}">Подтвердить email</a></p>
+    <p>Если вы не регистрировались на нашем сайте, проигнорируйте это письмо.</p>
+</body>
+</html>
