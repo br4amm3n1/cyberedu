@@ -1,6 +1,29 @@
 version: '3.8'
 
 services:
+  #nginx
+  nginx:
+    image: nginx:1.24-alpine
+    container_name: cyber_edu_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/ssl:ro
+      - ./frontend/build:/app/frontend_build:ro
+      - static_volume:/app/staticfiles:ro
+      - ./nginx/logs:/var/log/nginx
+    depends_on:
+      - backend
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      
   # PostgreSQL
   postgres:
     image: postgres:15
@@ -46,12 +69,11 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     container_name: cyber_edu_backend
-    ports:
-      - "192.168.1.66:8043:8000"  # Веб-сервер на порту 8043
     volumes:
       - ./backend:/app
       - ./frontend/build:/app/frontend_build
       - static_volume:/app/staticfiles
+      - media_volume:/app/media 
     environment:
       - DJANGO_SETTINGS_MODULE=cyber_edu.settings
       - POSTGRES_DB=${DB_NAME}
@@ -64,6 +86,8 @@ services:
       - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
       - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
       - RABBITMQ_QUEUE=email_tasks
+      - NGINX_HOST=nginx
+      - ALLOWED_HOSTS=localhost,nginx,cyberedu.tnimc.ru
     env_file:
       - .env
     depends_on:
@@ -73,11 +97,20 @@ services:
         condition: service_healthy
     networks:
       - app_network
+      
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
 volumes:
   postgres_data:
   rabbitmq_data:
   static_volume:
+  media_volume:
+  nginx_logs:
 
 networks:
   app_network:
