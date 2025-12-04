@@ -29,10 +29,8 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "localhost",
-    '127.0.0.1',
-    '192.168.1.66',
     '92.63.65.138',
+    'cyberedu.tnimc.ru',
 ]
 
 # Application definition
@@ -86,15 +84,16 @@ INTERNAL_IPS = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3043",
-    "http://192.168.1.66:8043",
-    "http://127.0.0.1:3043",
     "http://92.63.65.138:8043",
+    'http://cyberedu.tnimc.ru:8043',
 ]
 
 CORS_ALLOW_CREDENTIALS = True
 
-CSRF_TRUSTED_ORIGINS = ['http://192.168.1.66:8043', 'http://92.63.65.138:8043']
+CSRF_TRUSTED_ORIGINS = [
+	'http://92.63.65.138:8043',
+	'http://cyberedu.tnimc.ru:8043'
+]
 
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -184,7 +183,7 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv('LOGIN_MAIL')
 EMAIL_HOST_PASSWORD = os.getenv('PASSWORD_MAIL')
 DEFAULT_FROM_EMAIL = os.getenv('LOGIN_MAIL')
-FRONTEND_URL = "http://92.63.65.138:8043"
+FRONTEND_URL = "http://cyberedu.tnimc.ru:8043"
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
