@@ -91,8 +91,17 @@ export const getCurrentUser = async () => {
 export const getUsers = async () => {
     try {
         const response = await api.get('users/');
-        console.log(response.data)
         return response.data.results || response.data; // Обрабатываем оба формата ответа
+    } catch (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+    }
+};
+
+export const getProfiles = async () => {
+    try {
+        const response = await api.get('profiles/');
+        return response.data.results || response.data;
     } catch (error) {
         console.error('Error fetching users:', error);
         throw error;
@@ -112,6 +121,11 @@ export const updateUserData = async (userId, data) => {
 export const updateProfileData = async (profileId, data) => {
     const response = await api.patch(`profiles/${profileId}/`, data);
     return response.data;
+};
+
+export const getBranchChoices = async () => {
+    const response = await api.get(`branch-choices/`);
+    return response.data.results || response.data;
 };
 
 export default api;
