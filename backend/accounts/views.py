@@ -24,7 +24,7 @@ def confirm_email(request, token):
     profile.email_confirmed = True
     profile.email_confirmation_token = None
     profile.save()
-    return Response({'info': 'Электронный почтовый адрес успешно подтвержден. Вход в вашу учетную запись был выполнен автоматически.'})
+    return Response({'info': 'Электронный почтовый адрес успешно подтвержден.'})
 
 class ResendConfirmationView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -77,7 +77,6 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
-        login(request, user)
         return Response({
             'user': serializer.data,
         }, status=status.HTTP_201_CREATED)
