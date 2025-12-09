@@ -57,15 +57,16 @@ export const adminPanelStyles = {
     WebkitBoxOrient: 'vertical'
   },
   progressTableContainer: {
-    mt: 2,
-    maxHeight: 'none', // Убираем фиксированную высоту
-    overflow: 'visible' // Убираем скролл
+    maxHeight: '600px',
+    overflow: 'auto',
+    border: '1px solid',
+    borderColor: 'divider',
+    borderRadius: 1,
   },
+  
   progressTableCell: {
-    maxWidth: '200px',
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis'
+    padding: '12px 16px',
+    verticalAlign: 'top',
   },
   selectCell: {
     width: '300px',

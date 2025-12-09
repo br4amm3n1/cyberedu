@@ -1,43 +1,64 @@
-import React, { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Box, 
   Button, 
   Grid, 
-  Card, 
-  CardHeader, 
-  List, 
-  ListItem, 
-  ListItemText,
   Typography,
-  Chip,
-  IconButton,
-  Tooltip,
-  Container
+  Container,
+  CircularProgress
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import DeleteIcon from '@mui/icons-material/Delete';
 import SelectAllTransferList from '../TableAssignment/TransferList';
 import SelectionModal from '../shared/SelectionModal';
+import { SelectionCard } from '../shared/SelectionCard';
 import { assignCourseToUser } from '../../../api/courses';
+import { getProfiles, getBranchChoices } from '../../../api/auth';
+import { getAllCourses } from '../../../api/courses';
 
-const UsersTab = ({ users, courses, onError, onSuccess }) => {
+const UsersTab = ({ onError, onSuccess }) => {
+  // Состояния для данных
+  const [profiles, setProfiles] = useState([]);
+  const [courses, setCourses] = useState([]);
+  const [branchChoices, setBranchChoices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   // Состояния для модальных окон
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [courseModalOpen, setCourseModalOpen] = useState(false);
   
   // Выбранные пользователи и курсы
-  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [selectedProfiles, setSelectedProfiles] = useState([]);
   const [selectedCoursesForBulk, setSelectedCoursesForBulk] = useState([]);
 
-  // Обработчики модальных окон для пользователей
+  // Загрузка данных при монтировании
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [profilesData, coursesData, branchesData] = await Promise.all([
+          getProfiles(),
+          getAllCourses(),
+          getBranchChoices()
+        ]);
+        setProfiles(profilesData);
+        setCourses(coursesData);
+        setBranchChoices(branchesData);
+      } catch (error) {
+        onError('Ошибка загрузки данных');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, [onError]);
+
   const handleOpenUserModal = () => setUserModalOpen(true);
   const handleCloseUserModal = () => setUserModalOpen(false);
-  const handleSaveUsers = (users) => {
-    setSelectedUsers(users);
+  
+  const handleSaveUsers = (selectedProfiles) => {
+    setSelectedProfiles(selectedProfiles);
     setUserModalOpen(false);
   };
 
-  // Обработчики модальных окон для курсов
   const handleOpenCourseModal = () => setCourseModalOpen(true);
   const handleCloseCourseModal = () => setCourseModalOpen(false);
   const handleSaveCourses = (courses) => {
@@ -45,19 +66,16 @@ const UsersTab = ({ users, courses, onError, onSuccess }) => {
     setCourseModalOpen(false);
   };
 
-  // Удаление пользователя из выбранных
-  const handleRemoveUser = (userId) => {
-    setSelectedUsers(prev => prev.filter(user => user.id !== userId));
+  const handleRemoveUser = (profileId) => {
+    setSelectedProfiles(prev => prev.filter(profile => profile.id !== profileId));
   };
 
-  // Удаление курса из выбранных
   const handleRemoveCourse = (courseId) => {
     setSelectedCoursesForBulk(prev => prev.filter(course => course.id !== courseId));
   };
 
-  // Обработка массового назначения курсов
   const handleBulkAssign = async () => {
-    if (!selectedUsers.length || !selectedCoursesForBulk.length) {
+    if (!selectedProfiles.length || !selectedCoursesForBulk.length) {
       onError('Выберите пользователей и курсы для назначения');
       return;
     }
@@ -65,40 +83,39 @@ const UsersTab = ({ users, courses, onError, onSuccess }) => {
     try {
       const assignments = [];
       
-      // Создаем все задания для назначения
-      for (const user of selectedUsers) {
+      for (const profile of selectedProfiles) {
         for (const course of selectedCoursesForBulk) {
-          assignments.push({ user, course });
+          assignments.push({ profile, course });
         }
       }
 
-      // Выполняем все запросы параллельно
       const results = await Promise.allSettled(
-        assignments.map(({ user, course }) => 
-          assignCourseToUser({ user_id: user.id, course_id: course.id })
+        assignments.map(({ profile, course }) => 
+          assignCourseToUser({ 
+            user_id: profile.user.id, 
+            course_id: course.id 
+          })
         )
       );
 
-      // Анализируем результаты
       const successful = [];
       const alreadyAssigned = [];
       const failed = [];
 
       results.forEach((result, index) => {
-        const { user, course } = assignments[index];
+        const { profile, course } = assignments[index];
         
         if (result.status === 'fulfilled') {
           if (result.value.status === 'already subscribed') {
-            alreadyAssigned.push({ user, course });
+            alreadyAssigned.push({ profile, course });
           } else {
-            successful.push({ user, course });
+            successful.push({ profile, course });
           }
         } else {
-          failed.push({ user, course, error: result.reason });
+          failed.push({ profile, course, error: result.reason });
         }
       });
 
-      // Формируем сообщения о результатах
       let message = '';
       if (successful.length > 0) {
         message += `Успешно назначено: ${successful.length} назначений. `;
@@ -112,115 +129,24 @@ const UsersTab = ({ users, courses, onError, onSuccess }) => {
 
       if (failed.length === 0) {
         onSuccess(message.trim());
-        // Очищаем выбранные элементы после успешного назначения
-        setSelectedUsers([]);
+        setSelectedProfiles([]);
         setSelectedCoursesForBulk([]);
       } else {
         onError(message.trim());
       }
 
     } catch (error) {
-      onError('Ошибка при массовом назначении курсов', error);
+      onError('Ошибка при массовом назначении курсов');
     }
   };
 
-  // Компонент для отображения выбранных элементов
-  const SelectionCard = ({ title, items, onAdd, onRemove, type }) => (
-    <Card sx={{ 
-      height: '100%', 
-      display: 'flex', 
-      flexDirection: 'column',
-    }}>
-      <CardHeader 
-        title={
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Typography variant="h6">{title}</Typography>
-            <Chip 
-              label={items.length} 
-              color="primary" 
-              size="small" 
-            />
-          </Box>
-        }
-        action={
-          <IconButton 
-            onClick={onAdd}
-            sx={{
-              width: '40px',
-              height: '40px',
-              backgroundColor: 'primary.main',
-              color: 'white',
-              borderRadius: '8px',
-              '&:hover': {
-                backgroundColor: 'primary.dark'
-              }
-            }}
-          >
-            <AddIcon />
-          </IconButton>
-        }
-        sx={{ borderBottom: '1px solid', borderColor: 'divider' }}
-      />
-      <List sx={{ 
-        flexGrow: 1, 
-        overflow: 'auto', 
-        height: '300px',
-        minHeight: '300px',
-        maxHeight: '300px'
-      }}>
-        {items.length > 0 ? (
-          items.map((item) => (
-            <ListItem 
-              key={item.id} 
-              divider
-              secondaryAction={
-                <Tooltip title="Удалить">
-                  <IconButton 
-                    edge="end" 
-                    onClick={() => onRemove(item.id)}
-                    size="small"
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Tooltip>
-              }
-            >
-              <ListItemText 
-                primary={
-                  <Typography variant="body1" fontWeight="medium">
-                    {type === 'user' 
-                      ? `${item.first_name} ${item.last_name}`
-                      : item.title
-                    }
-                  </Typography>
-                }
-                secondary={
-                  type === 'user' 
-                    ? item.email 
-                    : `ID: ${item.id} • ${item.category || 'Без категории'}`
-                }
-              />
-            </ListItem>
-          ))
-        ) : (
-          <ListItem>
-            <ListItemText 
-              primary={
-                <Typography color="text.secondary" textAlign="center">
-                  Нет выбранных элементов
-                </Typography>
-              }
-              secondary={
-                <Typography variant="body2" color="text.secondary" textAlign="center">
-                  Нажмите "Добавить" чтобы выбрать
-                </Typography>
-              }
-            />
-          </ListItem>
-        )}
-      </List>
-    </Card>
-  );
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '400px' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Container maxWidth="xl" sx={{ py: 2 }}>
@@ -232,11 +158,12 @@ const UsersTab = ({ users, courses, onError, onSuccess }) => {
         maxWidth="lg"
       >
         <SelectAllTransferList 
-          allItems={users}
-          selectedItems={selectedUsers}
+          allItems={profiles}
+          selectedItems={selectedProfiles}
           onSave={handleSaveUsers}
           onClose={handleCloseUserModal}
-          type="user"
+          type="profile"
+          branchChoices={branchChoices}
         />
       </SelectionModal>
 
@@ -260,10 +187,10 @@ const UsersTab = ({ users, courses, onError, onSuccess }) => {
         <Grid item xs={12} md={6}>
           <SelectionCard
             title="Пользователи"
-            items={selectedUsers}
+            items={selectedProfiles}
             onAdd={handleOpenUserModal}
             onRemove={handleRemoveUser}
-            type="user"
+            type="profile"
           />
         </Grid>
         <Grid item xs={12} md={6}>
@@ -292,13 +219,13 @@ const UsersTab = ({ users, courses, onError, onSuccess }) => {
             Готово к назначению
           </Typography>
           <Typography variant="body2" sx={{ mb: 2, opacity: 0.9 }}>
-            {selectedUsers.length} пользователей × {selectedCoursesForBulk.length} курсов = {selectedUsers.length * selectedCoursesForBulk.length} назначений
+            {selectedProfiles.length} пользователей × {selectedCoursesForBulk.length} курсов = {selectedProfiles.length * selectedCoursesForBulk.length} назначений
           </Typography>
           <Button
             variant="contained"
             color="secondary"
             onClick={handleBulkAssign}
-            disabled={selectedUsers.length === 0 || selectedCoursesForBulk.length === 0}
+            disabled={selectedProfiles.length === 0 || selectedCoursesForBulk.length === 0}
             size="large"
             sx={{ 
               minWidth: 300,
