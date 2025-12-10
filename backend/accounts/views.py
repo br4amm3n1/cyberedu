@@ -18,13 +18,17 @@ from accounts.rabbitmq import publish_email_task
 
 
 @api_view(['GET'])
+def get_branch_choices(request):
+    return Response(Profile.BRANCH_CHOICES)
+
+@api_view(['GET'])
 @permission_classes([permissions.AllowAny])
 def confirm_email(request, token):
     profile = get_object_or_404(Profile, email_confirmation_token=token)
     profile.email_confirmed = True
     profile.email_confirmation_token = None
     profile.save()
-    return Response({'info': 'Электронный почтовый адрес успешно подтвержден.'})
+    return Response({'info': 'Электронный почтовый адрес успешно подтвержден. Вход в вашу учетную запись был выполнен автоматически.'})
 
 class ResendConfirmationView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -77,6 +81,7 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        login(request, user)
         return Response({
             'user': serializer.data,
         }, status=status.HTTP_201_CREATED)
@@ -188,4 +193,3 @@ class ProfileViewSet(viewsets.ModelViewSet):
         profile = request.user.profile
         serializer = self.get_serializer(profile)
         return Response(serializer.data)
-    

@@ -12,4 +12,5 @@ urlpatterns = [
     path('logout/', views.LogoutView.as_view(), name='logout'),
     path('confirm-email/<str:token>/', views.confirm_email, name='confirm-email'),
     path('resend_confirmation/', views.ResendConfirmationView.as_view(), name='resend-confirmation'),
+    path('branch-choices/', views.get_branch_choices, name='branch-choices'),
 ] + router.urls
