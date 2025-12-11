@@ -1,13 +1,10 @@
 from rest_framework import viewsets, permissions, status
 from rest_framework.response import Response
-from rest_framework.decorators import action, api_view
+from rest_framework.decorators import action
 from django.contrib.auth import get_user_model
-from django.db import transaction, IntegrityError
+from django.db import transaction
 from django.utils import timezone
 from django.db.models import Max, Sum
-from django.http import HttpResponse
-from django.views.decorators.cache import cache_control
-from django.conf import settings
 from .models import (
     Course, LearningMaterial, Test, 
     Question, AnswerOption, CourseProgress,
@@ -343,31 +340,26 @@ class CourseProgressViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
     
     def get_queryset(self):
-        queryset = super().get_queryset()
-        course_id = self.request.query_params.get('course_id')
-
         # Для администраторов
         if self.request.user.is_staff:
-            if course_id:
-                return queryset.filter(course_id=course_id)
-            return queryset
+            return CourseProgress.objects.all()
         
-        # Для обычных пользователей
-        if course_id:
-            return queryset.filter(user=self.request.user, course_id=course_id)
-        return queryset.filter(user=self.request.user)
+        # Для обычных пользователей - строго только их записи
+        return CourseProgress.objects.filter(user=self.request.user)
     
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         course_id = request.query_params.get('course_id')
         
         if course_id:
-            progress = queryset.first()
+            # Ищем именно прогресс текущего пользователя для этого курса
+            progress = queryset.filter(course_id=course_id).first()
             if progress:
                 serializer = self.get_serializer(progress)
                 return Response(serializer.data)
-            return Response({})
+            return Response({})  # Или Response(None, status=404)
         
+        # Если course_id не указан, возвращаем все прогрессы пользователя
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
     
@@ -438,7 +430,7 @@ class CourseProgressViewSet(viewsets.ModelViewSet):
             progress.save()
             return Response({'status': 'course completed'})
         return Response({'status': 'course not in progress'}, status=status.HTTP_400_BAD_REQUEST)
-    
+
 class UserAnswerViewSet(viewsets.ModelViewSet):
     queryset = UserAnswer.objects.all()
     serializer_class = UserAnswerSerializer
