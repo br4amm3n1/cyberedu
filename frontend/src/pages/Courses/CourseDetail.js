@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, Link, Outlet, useLocation } from 'react-router-dom';
 import { 
   Container, 
@@ -17,6 +17,7 @@ import {
 import { CheckCircle, PlayCircle, Lock } from '@mui/icons-material';
 import api from '../../api/courses';
 import MaterialsList from './MaterialsList';
+import { getUserProgressCourses } from '../../api/courses';
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -31,11 +32,12 @@ const CourseDetail = () => {
   useEffect(() => {
     const fetchCourseInfo = async () => {
       try {
-        const [responseCourse, responseProgress] = await Promise.all([
+        const [responseCourse] = await Promise.all([
           api.get(`/courses/${id}/`),
-          api.get(`/progress/?course_id=${id}`)
         ]);
         
+        const responseProgress = await getUserProgressCourses(id);
+
         setCourse(responseCourse.data);
         setCourseProgress(responseProgress.data || null);
       } catch (error) {
