@@ -12,7 +12,7 @@ const MaterialsList = ({ courseId }) => {
         const response = await api.get('materials/', {
           params: { course_id: courseId }
         });
-        console.log(response.data)
+
         setMaterials(response.data);
       } catch (error) {
         console.error('Error fetching materials:', error);
