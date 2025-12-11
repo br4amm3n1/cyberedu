@@ -31,6 +31,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '92.63.65.138',
     'cyberedu.tnimc.ru',
+    '192.168.1.66'
 ]
 
 # Application definition
@@ -65,6 +66,10 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_AGE = 3600  # 1 час
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -87,6 +92,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://92.63.65.138",
     'http://cyberedu.tnimc.ru',
     'https://cyberedu.tnimc.ru',
+    'http://192.168.1.66'
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -95,6 +101,7 @@ CSRF_TRUSTED_ORIGINS = [
 	'http://92.63.65.138',
 	'http://cyberedu.tnimc.ru',
     'https://cyberedu.tnimc.ru',
+    'http://192.168.1.66'
 ]
 
 CORS_ALLOW_METHODS = [
