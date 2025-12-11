@@ -42,8 +42,16 @@ export const subscribeToCourse = async (userId, courseId) => {
   }
 };
 
-export const getUserProgressCourses = async () => {
+export const getUserProgressCourses = async (course_id=false) => {
     try {
+      if (course_id) {
+        const response = await api.get(`progress/?course_id=${course_id}`);
+        return {
+          data: response.data.results || response.data,
+          status: response.status,
+        };
+      };
+
       const response = await api.get('progress/');
       return {
         data: response.data.results || response.data,
