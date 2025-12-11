@@ -5,6 +5,7 @@ from django.dispatch import receiver
 from django.conf import settings
 # from accounts.services.email_service import send_email
 from accounts.rabbitmq import publish_email_task
+from django.utils import timezone
 
 class Course(models.Model):
     CATEGORY_CHOICES = [
@@ -154,10 +155,67 @@ class CourseProgress(models.Model):
             for test in tests
         )
     
+    def check_and_update_status(self):
+        """
+        Проверяет выполнение тестов и обновляет статус прогресса
+        """
+        was_completed = self.status == 'completed'
+        tests_completed = self.check_tests_completion()
+        
+        if tests_completed:
+            self.status = 'completed'
+            self.progress_percent = 100
+            if not self.completed_at:
+                self.completed_at = timezone.now()
+        else:
+            if was_completed:
+                self.status = 'in_progress'
+                self.completed_at = None
+            
+            # Пересчитываем процент выполнения
+            if self.score > 0:
+                # Получаем текущие баллы пользователя
+                user_answers = UserAnswer.objects.filter(
+                    user=self.user,
+                    question__test__course=self.course
+                )
+                total_score_earned = sum(answer.points_earned for answer in user_answers)
+                self.progress_percent = min(100, int((total_score_earned / self.score) * 100))
+        
+        self.save()
+
     def __str__(self):
         return f"Прогресс: {self.user.username} → {self.course.title} ({self.get_status_display()}, {self.progress_percent}%)"
 
+@receiver(post_save, sender=Test)
+def update_course_progress_on_test_change(sender, instance, created, **kwargs):
+    """
+    Пересчитывает прогресс курса при изменении теста
+    """
+    if not created:  # Если это обновление существующего теста
+        course = instance.course
+        update_course_progress_for_all_users(course)
 
+@receiver(post_save, sender=Question)
+@receiver(post_delete, sender=Question)
+def update_test_max_score_and_progress(sender, instance, **kwargs):
+    """Обновляет max_score теста и пересчитывает прогресс"""
+    test = instance.test
+    test.save()  # Это вызовет save() теста, который триггерит сигнал выше
+    
+    # Или можно явно вызвать пересчет
+    update_course_progress_for_all_users(test.course)
+
+def update_course_progress_for_all_users(course):
+    """
+    Пересчитывает прогресс курса для всех пользователей
+    """
+    progresses = CourseProgress.objects.filter(course=course)
+    
+    for progress in progresses:
+        progress.save()  # Это вызовет пересчет score
+        progress.check_and_update_status()
+        
 @receiver(post_save, sender=Test)
 @receiver(post_delete, sender=Test)
 def update_course_progress_score(sender, instance, **kwargs):
