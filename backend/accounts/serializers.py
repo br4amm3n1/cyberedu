@@ -1,12 +1,49 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from django.conf import settings
 from django.utils.crypto import get_random_string
 from .models import Profile
 # from .services.email_service import send_email
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from accounts.rabbitmq import publish_email_task
+from django.core.validators import EmailValidator
+import re
+
+
+ALLOWED_DOMAINS = [
+    'medgenetics.ru',
+    'tnimc.ru', 
+    'pharmso.ru',
+    'cardio-tomsk.ru',
+    'infarkta.ru',
+    'oncology.tomsk.ru'
+]
+def validate_email_domain(value):
+    if not value:
+        return value
+    
+    domain_match = re.search(r'@([a-zA-Z0-9.-]+)$', value)
+    if not domain_match:
+        raise serializers.ValidationError("Некорректный email адрес")
+    
+    domain = domain_match.group(1)
+    
+    allowed = False
+    for allowed_domain in ALLOWED_DOMAINS:
+        # Проверяем, что домен заканчивается на разрешенный домен
+        # Например: medgenetics.ru заканчивается на medgenetics
+        if domain.endswith('.' + allowed_domain) or domain == allowed_domain:
+            allowed = True
+            break
+    
+    if not allowed:
+        # Можно добавить .ru к доменам для лучшей читаемости
+        domains_with_tld = [f"{domain}" for domain in ALLOWED_DOMAINS]
+        raise serializers.ValidationError(
+            f"Email должен быть в одном из доменов: {', '.join(domains_with_tld)}"
+        )
+    
+    return value
 
 def generate_confirmation_token():
     return get_random_string(length=32)
@@ -22,6 +59,10 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     position = serializers.CharField(write_only=True)
     branch = serializers.CharField(write_only=True)
     patronymic = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    email = serializers.EmailField(
+        required=True,
+        validators=[validate_email_domain]
+    )
 
     class Meta:
         model = User
@@ -71,6 +112,17 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         
         return user
     
+    def validate(self, data):
+        """
+        Дополнительная валидация данных
+        """
+        # Проверяем, что email уникален
+        if User.objects.filter(email=data.get('email')).exists():
+            raise serializers.ValidationError({
+                'email': 'Пользователь с таким email уже существует'
+            })
+        
+        return data
     
 # В serializers.py обновляем UserSerializer
 class UserSerializer(serializers.ModelSerializer):

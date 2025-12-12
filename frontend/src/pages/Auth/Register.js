@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { register } from '../../api/auth';
 import { TextField, Button, Typography, Container, Box, Paper, 
   Step, StepLabel, Stepper, Alert, MenuItem } from '@mui/material';
@@ -7,7 +7,6 @@ import * as Yup from 'yup';
 
 const Register = () => {
   const [error, setError] = useState('');
-  const [domainError, setDomainError] = useState('');
   const [success, setSuccess] = useState('');
   const [activeStep, setActiveStep] = useState(0);
 
@@ -59,8 +58,10 @@ const Register = () => {
           setError('Пользователь с таким электронным почтовым адресом уже существует.')
         } else if (err.password) {
           setError('Пароль должен быть длиной не менее 8 символов и содержать хотя бы 1 символ, 1 цифру и 1 заглавную букву.');
+        } else if (err.email) {
+          setError(err.email);
         } else {
-          setError(err.email || 'Регистрация не удалась');
+          setError(err.message || 'Регистрация не удалась');
         }
         setSuccess('');
       }
@@ -75,26 +76,6 @@ const Register = () => {
     }
   }, [formik.values.email]);
 
-  useEffect(() => {
-    if (formik.values.email && domainError) {
-      const isValidDomain = checkMailDomain(formik.values.email);
-      if (isValidDomain) {
-        setDomainError(false);
-        setError('');
-      }
-    }
-  }, [formik.values.email, domainError]);
-  
-  const checkMailDomain = (email) => {
-    if (!email) return false; 
-
-    const allowedDomains = ['medgenetics', 'tnimc', 'pharmso', 'cardio-tomsk', 'infarkta'];
-
-    const nameMailDomain = email.slice(email.indexOf('@') + 1, email.lastIndexOf('.'));
-
-    return allowedDomains.includes(nameMailDomain);
-  };
-
   const handleNext = () => {
     if (activeStep === 0) {
       // Проверка заполнения всех обязательных полей
@@ -102,7 +83,6 @@ const Register = () => {
       const emptyFields = requiredFields.filter(field => !formik.values[field]);
       
       if (emptyFields.length > 0) {
-        // Помечаем незаполненные поля как touched, чтобы показать ошибки
         emptyFields.forEach(field => {
           formik.setFieldTouched(field, true);
         });
@@ -110,19 +90,10 @@ const Register = () => {
         return;
       }
 
-      // Проверка валидности email
+      // Проверка валидности email (только формат)
       if (formik.errors.email) {
         formik.setFieldTouched('email', true);
         setError(formik.errors.email);
-        return;
-      }
-
-      // Проверка домена email
-      const isValidDomain = checkMailDomain(formik.values.email);
-      if (!isValidDomain) {
-        setDomainError(true);
-        formik.setFieldTouched('email', true);
-        setError('Для регистрации воспользуйтесь адресом личной корпоративной почты.');
         return;
       }
 
@@ -139,7 +110,6 @@ const Register = () => {
       // Все проверки пройдены - переходим на следующий шаг
       setActiveStep(activeStep + 1);
       setError('');
-      setDomainError(false);
     } else {
       formik.handleSubmit();
     }
