@@ -1,10 +1,8 @@
 from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import path, include
 from django.conf import settings
-from django.views.generic import TemplateView
 from django.conf.urls.static import static
-from django.http import HttpResponse
-from .views import serve_icon
+from .views import serve_icon, phishing_proxy
         
 urlpatterns = [
     path('logo32x32.png', serve_icon, {'icon_name': 'logo32x32.png'}),
@@ -12,8 +10,9 @@ urlpatterns = [
     path('api/accounts/', include('accounts.urls')),
     path('api/courses/', include('courses.urls')),
     path('api/documents/', include('documents.urls')),
+    path('api/phishing/', phishing_proxy, name='phishing-proxy'),
 
-    re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
+    # re_path(r'^.*$', TemplateView.as_view(template_name='index.html')),
     # path('api-auth/', include('rest_framework.urls')),
 ]
 
