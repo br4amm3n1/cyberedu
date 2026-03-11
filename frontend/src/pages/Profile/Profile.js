@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import { Edit, Lock, Email, Work, Groups, CalendarToday, Business, BusinessCenterSharp } from '@mui/icons-material';
 import { AuthContext } from '../../context/AuthContext';
-import { getUserProgressCourses, unsubscribeToCourse } from '../../api/courses';
+import { getUserProgressCourses } from '../../api/courses';
 import ProfileCoursesProgress from './ProfileCoursesProgress';
 
 const Profile = () => {

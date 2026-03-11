@@ -1,4 +1,3 @@
-import React, { useContext } from 'react';
 import { Link } from "react-router-dom";
 import {
   Typography,
@@ -6,31 +5,12 @@ import {
   Card,
   CardContent,
   Chip,
-  Button,
   LinearProgress,
   CircularProgress,
   Box
 } from '@mui/material';
-import { unsubscribeToCourse } from '../../api/courses';
-import { AuthContext } from '../../context/AuthContext';
 
-const ProfileCoursesProgress = ({ courses, loadingCourses, onUnsubscribe }) => {
-    const { isAuthenticated } = useContext(AuthContext);
-  
-  //   const handleUnsubscribe = async (progressId) => {
-  //       if (!isAuthenticated) {
-  //           console.error('User is not authenticated');
-  //           return;
-  //       }
-
-  //       try {
-  //           await unsubscribeToCourse(progressId);
-  //           onUnsubscribe();
-  //       } catch (err) {
-  //           console.error('Unsubscribe failed:', err);
-  //       }
-  // };
-
+const ProfileCoursesProgress = ({ courses, loadingCourses }) => {
   if (loadingCourses) {
     return <CircularProgress />;
   }
@@ -125,22 +105,6 @@ const ProfileCoursesProgress = ({ courses, loadingCourses, onUnsubscribe }) => {
                   </Typography>
                 </Box>
               )}
-              
-              {/* <Box sx={{ mt: 'auto', alignSelf: 'flex-end' }}>
-                <Button
-                  variant="outlined"
-                  color="error"
-                  size="small"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleUnsubscribe(courseProgress.id);
-                  }}
-                  disabled={!isAuthenticated}
-                >
-                  Отменить подписку
-                </Button>
-              </Box> */}
             </CardContent>
           </Card>
         </Grid>

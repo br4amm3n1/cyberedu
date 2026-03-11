@@ -68,15 +68,6 @@ export const getUserTestResults = async (courseId) => {
     return response;
 };
 
-export const unsubscribeToCourse = async (progressId) => {
-    try {
-      const response = await api.post(`progress/${progressId}/unsubscribe/`);
-      return response.data;
-    } catch (error) {
-      throw error.response.data;
-    }
-};
-
 export const getAllCourses = async () => {
     try {
         const response = await api.get('courses/');
