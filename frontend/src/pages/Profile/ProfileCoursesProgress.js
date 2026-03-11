@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
+  Paper,
   Typography,
   Grid,
   Card,
@@ -149,4 +150,4 @@ const ProfileCoursesProgress = ({ courses, loadingCourses }) => {
   );
 };
 
-export default ProfileCoursesProgress;tion
+export default ProfileCoursesProgress;

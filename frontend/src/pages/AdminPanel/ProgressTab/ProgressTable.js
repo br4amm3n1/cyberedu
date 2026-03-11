@@ -12,7 +12,6 @@ import {
 import { adminPanelStyles } from '../adminPanelStyles';
 
 const ProgressTable = ({ progressData, page, rowsPerPage }) => {
-  // Защитные проверки
   if (!progressData || !Array.isArray(progressData) || progressData.length === 0) {
     return (
       <Paper sx={{ p: 3, textAlign: 'center' }}>
@@ -23,7 +22,6 @@ const ProgressTable = ({ progressData, page, rowsPerPage }) => {
     );
   }
 
-  // Пагинация с защитой от выхода за границы
   const startIndex = (page - 1) * rowsPerPage;
   const endIndex = Math.min(startIndex + rowsPerPage, progressData.length);
   const paginatedProgress = progressData.slice(startIndex, endIndex);
