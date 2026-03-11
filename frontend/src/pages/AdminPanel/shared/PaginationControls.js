@@ -1,4 +1,3 @@
-import React from 'react';
 import { Box, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import Pagination from '@mui/material/Pagination';
 
@@ -25,7 +24,7 @@ const PaginationControls = ({
           onChange={(e) => onRowsPerPageChange(e.target.value)}
           label="Строк на странице"
         >
-          {[5, 10, 20, 50].map((num) => (
+          {[2, 4, 6, 10].map((num) => (
             <MenuItem key={num} value={num}>{num}</MenuItem>
           ))}
         </Select>

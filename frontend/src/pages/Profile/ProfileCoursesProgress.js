@@ -1,3 +1,4 @@
+import { useState, useCallback } from "react";
 import { Link } from "react-router-dom";
 import {
   Typography,
@@ -9,15 +10,42 @@ import {
   CircularProgress,
   Box
 } from '@mui/material';
+import PaginationControls from "../AdminPanel/shared/PaginationControls"
 
 const ProfileCoursesProgress = ({ courses, loadingCourses }) => {
+  const [page, setPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(4);
+
+  if (!courses || !Array.isArray(courses)) {
+      return (
+        <Paper sx={{ p: 3, textAlign: 'center' }}>
+          <Typography color="text.secondary">
+            Нет данных для отображения
+          </Typography>
+        </Paper>
+      );
+    };
+    
+    if (courses.length === 0) {
+      return <Typography>Вы не подписаны ни на один курс</Typography>;
+    };
+  
+  const startIndex = (page - 1) * rowsPerPage;
+  const endIndex = Math.min(startIndex + rowsPerPage, courses.length);
+  const paginatedCourses = courses.slice(startIndex, endIndex);
+
   if (loadingCourses) {
     return <CircularProgress />;
   }
 
-  if (courses.length === 0) {
-    return <Typography>Вы не подписаны ни на один курс</Typography>;
-  }
+  const handlePageChange = (page) => {
+    setPage(page);
+  };
+
+  const handleRowsPerPageChange = (value) => {
+    setRowsPerPage(value);
+    setPage(1);
+  };
 
   return (
     <Grid container spacing={3} sx={{ 
@@ -29,7 +57,7 @@ const ProfileCoursesProgress = ({ courses, loadingCourses }) => {
       },
       gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
     }}>
-      {courses.map((courseProgress) => (
+      {paginatedCourses.map((courseProgress) => (
         <Grid item xs={12} sm={6} key={courseProgress.id} sx={{ display: 'flex' }}>
           <Card 
             component={Link}
@@ -109,8 +137,16 @@ const ProfileCoursesProgress = ({ courses, loadingCourses }) => {
           </Card>
         </Grid>
       ))}
+
+      <PaginationControls 
+        count={courses.length}
+        page={page}
+        rowsPerPage={rowsPerPage}
+        onPageChange={handlePageChange}
+        onRowsPerPageChange={handleRowsPerPageChange}
+      />
     </Grid>
   );
 };
 
-export default ProfileCoursesProgress;
+export default ProfileCoursesProgress;tion
