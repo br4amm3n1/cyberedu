@@ -94,6 +94,8 @@ const ProgressTab = () => {
         count={progressData.length}
         page={page}
         rowsPerPage={rowsPerPage}
+        rowsPerPageLabel={"Строк на странице"}
+        rowsPerPageOptions={[5, 10, 25, 50]}
         onPageChange={handlePageChange}
         onRowsPerPageChange={handleRowsPerPageChange}
       />

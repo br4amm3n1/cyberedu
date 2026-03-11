@@ -5,8 +5,10 @@ const PaginationControls = ({
   count, 
   page, 
   rowsPerPage, 
+  rowsPerPageLabel,
+  rowsPerPageOptions,
   onPageChange, 
-  onRowsPerPageChange 
+  onRowsPerPageChange,
 }) => {
   return (
     <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
@@ -18,13 +20,13 @@ const PaginationControls = ({
       />
       
       <FormControl size="small" sx={{ width: '150px', ml: 2 }}>
-        <InputLabel>Строк на странице</InputLabel>
+        <InputLabel>{rowsPerPageLabel}</InputLabel>
         <Select
           value={rowsPerPage}
           onChange={(e) => onRowsPerPageChange(e.target.value)}
           label="Строк на странице"
         >
-          {[2, 4, 6, 10].map((num) => (
+          {rowsPerPageOptions.map((num) => (
             <MenuItem key={num} value={num}>{num}</MenuItem>
           ))}
         </Select>

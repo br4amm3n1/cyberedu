@@ -54,9 +54,11 @@ const ProfileCoursesProgress = ({ courses, loadingCourses }) => {
         count={courses.length}
         page={page}
         rowsPerPage={rowsPerPage}
+        rowsPerPageLabel={"Курсов на странице"}
+        rowsPerPageOptions={[2, 4]}
         onPageChange={handlePageChange}
-        onRowsPerPageChange={handleRowsPerPageChange}>
-      </PaginationControls> 
+        onRowsPerPageChange={handleRowsPerPageChange}
+      />
 
       <Grid container spacing={3} sx={{ 
         display: "grid",
