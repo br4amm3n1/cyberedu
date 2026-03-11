@@ -34,13 +34,7 @@ function App() {
           </Route>
           <Route path="profile" element={<PrivateRoute><Profile /></PrivateRoute> }/>
           <Route path="profile/edit" element={<PrivateRoute><EditProfile /></PrivateRoute> }/>
-          <Route path="admin-panel" element={
-            <PrivateRoute>
-              <AdminRoute>
-                <AdminPanel />
-              </AdminRoute>
-            </PrivateRoute>
-          } />
+          <Route path="admin-panel" element={<AdminRoute> <AdminPanel /> </AdminRoute> }/>
           <Route path="documents" element={<PrivateRoute><Documents /></PrivateRoute>} />
         </Route>
       </Routes>
