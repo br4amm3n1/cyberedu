@@ -106,7 +106,7 @@ const Profile = () => {
               {user?.first_name} {user?.last_name}
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
-              @{user?.username}
+              #{user?.username}
             </Typography>
             <Chip
               label={profile?.role === 'admin' ? 'Администратор' : 'Работник'}
@@ -196,8 +196,7 @@ const Profile = () => {
         <Typography variant="h4" gutterBottom>Мои курсы</Typography>
         <ProfileCoursesProgress 
           courses={courses} 
-          loadingCourses={loadingCourses} 
-          onUnsubscribe={loadCourses} 
+          loadingCourses={loadingCourses}
         />
       </Container>
     </Container>
