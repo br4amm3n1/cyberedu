@@ -80,10 +80,8 @@ export const logout = async () => {
 };
 
 export const getCurrentUser = async () => {
-  const userResponse = await api.get('users/me/');
   const profileResponse = await api.get('profiles/me/');
   return {
-      user: userResponse.data,
       profile: profileResponse.data,
   };
 };

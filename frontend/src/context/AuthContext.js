@@ -13,7 +13,9 @@ export const AuthProvider = ({ children }) => {
 
     const loadUserData = async () => {
         try {
-            const { user, profile } = await getCurrentUser();
+            const { profile } = await getCurrentUser();
+            const user = profile.user;
+
             setAuthState({
                 isAuthenticated: true,
                 user,
@@ -28,14 +30,17 @@ export const AuthProvider = ({ children }) => {
                 isLoading: false
             });
         }
-  };
+    };
 
     useEffect(() => {
         loadUserData();
     }, [authState.isAuthenticated]);
 
   const handleLogin = async () => {
-      await loadUserData();
+      setAuthState(prev => ({
+        ...prev,
+        isAuthenticated: true,
+      }));
   };
 
   const handleLogout = async () => {
@@ -47,15 +52,6 @@ export const AuthProvider = ({ children }) => {
         isLoading: false,
       });
     };
-
-  const updateUserProfile = async (updates) => {
-      const { user, profile } = await getCurrentUser();
-      setAuthState(prev => ({
-          ...prev,
-          user: { ...user, ...updates.user },
-          profile: { ...profile, ...updates.profile }
-      }));
-  };
 
   const updateAuthState = (newData) => {
       setAuthState(prev => ({
@@ -70,7 +66,6 @@ export const AuthProvider = ({ children }) => {
         ...authState,
         handleLogin,
         handleLogout,
-        updateUserProfile,
         updateAuthState,
       }}>
         {!authState.isLoading && children}

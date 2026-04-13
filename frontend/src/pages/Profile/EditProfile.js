@@ -82,11 +82,12 @@ const EditProfile = () => {
         
         await new Promise(resolve => setTimeout(resolve, 100));
         
-        const updatedData = await getCurrentUser();
+        const { profile } = await getCurrentUser();
+        const user = profile.user;
 
         updateAuthState({
-          user: updatedData.user,
-          profile: updatedData.profile,
+          user,
+          profile,
         });
         
         setSuccess('Профиль успешно обновлен!');
