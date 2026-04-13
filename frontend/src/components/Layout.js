@@ -16,7 +16,6 @@ const Layout = () => {
         <>
             <AppBar position="static">
                 <Toolbar>
-                    {/* Левая часть с меню и основными кнопками */}
                     <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
 
                         <Typography variant="h6" component="div" sx={{ mr: 2 }}>
@@ -44,8 +43,6 @@ const Layout = () => {
                         )}
                     </Box>
 
-
-                    {/* Правая часть с кнопками авторизации */}
                     <Box>
                         {isAuthenticated && (
                             <>
