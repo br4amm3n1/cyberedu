@@ -30,14 +30,11 @@ def validate_email_domain(value):
     
     allowed = False
     for allowed_domain in ALLOWED_DOMAINS:
-        # Проверяем, что домен заканчивается на разрешенный домен
-        # Например: medgenetics.ru заканчивается на medgenetics
         if domain.endswith('.' + allowed_domain) or domain == allowed_domain:
             allowed = True
             break
     
     if not allowed:
-        # Можно добавить .ru к доменам для лучшей читаемости
         domains_with_tld = [f"{domain}" for domain in ALLOWED_DOMAINS]
         raise serializers.ValidationError(
             f"Email должен быть в одном из доменов: {', '.join(domains_with_tld)}"
@@ -95,12 +92,10 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         if patronymic:
             profile.patronymic = patronymic
         
-        # Генерируем токен подтверждения
         confirmation_token = generate_confirmation_token()
         profile.email_confirmation_token = confirmation_token
         profile.save()
         
-        # Отправляем email через сервисный слой
         task_data = {
                 'user_id': user.id,
                 'action': 'confirmation'
@@ -116,7 +111,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         """
         Дополнительная валидация данных
         """
-        # Проверяем, что email уникален
         if User.objects.filter(email=data.get('email')).exists():
             raise serializers.ValidationError({
                 'email': 'Пользователь с таким email уже существует'
@@ -124,7 +118,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         
         return data
     
-# В serializers.py обновляем UserSerializer
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

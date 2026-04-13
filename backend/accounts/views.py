@@ -151,7 +151,6 @@ class UserViewSet(viewsets.ModelViewSet):
         })
     
     def retrieve(self, request, *args, **kwargs):
-        # Для отдельных запросов тоже обновляем соединение
         connection.close()
         return super().retrieve(request, *args, **kwargs)
     
