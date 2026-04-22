@@ -7,7 +7,6 @@ import Register from './pages/Auth/Register';
 import CourseList from './pages/Courses/CourseList';
 import CourseDetail from './pages/Courses/CourseDetail';
 import PrivateRoute from './components/PrivateRoute';
-import AdminRoute from './components/AdminRoute';
 import TestDetail from './pages/Courses/Tests/TestDetail';
 import TestsList from './pages/Courses/Tests/TestsList';
 import Profile from './pages/Profile/Profile';
@@ -34,7 +33,7 @@ function App() {
           </Route>
           <Route path="profile" element={<PrivateRoute><Profile /></PrivateRoute> }/>
           <Route path="profile/edit" element={<PrivateRoute><EditProfile /></PrivateRoute> }/>
-          <Route path="admin-panel" element={<AdminRoute> <AdminPanel /> </AdminRoute> }/>
+          <Route path="admin-panel" element={<PrivateRoute> <AdminPanel /> </PrivateRoute> }/>
           <Route path="documents" element={<PrivateRoute><Documents /></PrivateRoute>} />
         </Route>
       </Routes>
