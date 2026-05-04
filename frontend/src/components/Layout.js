@@ -9,7 +9,7 @@ const Layout = () => {
 
     const handleLogoutClick = () => {
         handleLogout();
-        navigate('/');
+        navigate('/login', { replace: true });
     };
 
     return (

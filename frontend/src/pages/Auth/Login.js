@@ -14,6 +14,12 @@ const Login = () => {
   const [resendDisabled, setResendDisabled] = useState(false);
   const [countdown, setCountdown] = useState(60);
 
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  };
+
+  const from = location.state?.from || '/';
+
   const formik = useFormik({
     initialValues: {
       username: '',
@@ -28,7 +34,7 @@ const Login = () => {
         await login(values);
         await handleLogin();
         
-        navigate('/');
+        navigate(from, { replace: true });
       } catch (err) {
         if (err.error) {
           if (err.error === 'email_not_confirmed') {
