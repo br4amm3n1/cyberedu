@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate, useLocation } from 'react-router-dom';
 import { login, resendConfirmationEmail } from '../../api/auth';
 import { TextField, Button, Typography, Container, Box, Link } from '@mui/material';
 import { useFormik } from 'formik';
@@ -7,8 +7,9 @@ import * as Yup from 'yup';
 import { AuthContext } from '../../context/AuthContext';
 
 const Login = () => {
-  const { handleLogin } = useContext(AuthContext); 
+  const { handleLogin, isAuthenticated } = useContext(AuthContext); 
   const navigate = useNavigate();
+  const location = useLocation();
   const [error, setError] = useState('');
   const [errorType, setErrorType] = useState('');
   const [resendDisabled, setResendDisabled] = useState(false);
