@@ -15,10 +15,6 @@ const Login = () => {
   const [resendDisabled, setResendDisabled] = useState(false);
   const [countdown, setCountdown] = useState(60);
 
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />;
-  };
-
   const from = location.state?.from || '/';
 
   const formik = useFormik({
@@ -76,6 +72,10 @@ const Login = () => {
       setError(err.message || 'Ошибка при отправке письма');
       setResendDisabled(false);
     }
+  };
+
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
   };
 
   return (
