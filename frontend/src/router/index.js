@@ -29,19 +29,6 @@ export const authLoader = async () => {
   }
 };
 
-export const publicLoader = async () => {
-  try {
-    await getCurrentUser();
-    return redirect('/');
-  } catch (error) {
-    return null;
-  }
-};
-
-const AuthErrorBoundary = () => {
-  return <Navigate to="/login" replace state={{ from: window.location.pathname }} />;
-};
-
 function redirect(url) {
   throw new Response('Redirect', { status: 302, headers: { Location: url } });
 }
@@ -50,14 +37,10 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <Login />,
-    loader: publicLoader,
-    errorElement: <Navigate to="/" replace />,
   },
   {
     path: '/register',
     element: <Register />,
-    loader: publicLoader,
-    errorElement: <Navigate to="/" replace />,
   },
   {
     path: '/confirm-email/:token',
@@ -66,7 +49,7 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
-    errorElement: <AuthErrorBoundary />,
+    errorElement: <Navigate to="/login" replace />,
     children: [
       {
         index: true,
