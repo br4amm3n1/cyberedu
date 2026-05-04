@@ -32,16 +32,6 @@ function getCookie(name) {
   if (parts.length === 2) return parts.pop().split(';').shift();
 }
 
-api.interceptors.response.use(
-    response => response,
-    error => {
-      if (error.response?.status === 401 || error.response?.status === 403) {
-        // window.location.reload();
-      }
-      return Promise.reject(error);
-    }
-  );
-
 export const register = async (userData) => {
   try {
     const response = await api.post('register/', userData);
