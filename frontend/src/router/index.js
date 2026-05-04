@@ -29,10 +29,6 @@ export const authLoader = async () => {
   }
 };
 
-function redirect(url) {
-  throw new Response('Redirect', { status: 302, headers: { Location: url } });
-}
-
 export const router = createBrowserRouter([
   {
     path: '/login',
