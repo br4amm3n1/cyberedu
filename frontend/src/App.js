@@ -14,6 +14,7 @@ import EditProfile from './pages/Profile/EditProfile';
 import Documents from './pages/Documents/Documents';
 import AdminPanel from './pages/AdminPanel/AdminPanel';
 import ConfirmEmail from './pages/Auth/ConfirmEmail';
+import AdminRoute from './components/AdminRoute';
 
 function App() {
   return (
@@ -33,7 +34,7 @@ function App() {
             </Route>
             <Route path="profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
             <Route path="profile/edit" element={<PrivateRoute><EditProfile /></PrivateRoute>} />
-            <Route path="admin-panel" element={<PrivateRoute> <AdminPanel /> </PrivateRoute>} />
+            <Route path="admin-panel" element={<AdminRoute> <AdminPanel /> </AdminRoute>} />
             <Route path="documents" element={<PrivateRoute><Documents /></PrivateRoute>} />
           </Route>
         </Routes>

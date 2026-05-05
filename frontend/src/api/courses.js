@@ -9,14 +9,13 @@ api.defaults.xsrfHeaderName = "X-CSRFToken";
 api.defaults.xsrfCookieName = "csrftoken";
 
 api.interceptors.request.use((config) => {
-  const csrfToken = getCookie('csrftoken'); // Функция для получения куки
+  const csrfToken = getCookie('csrftoken');
   if (csrfToken && ['post', 'put', 'patch', 'delete'].includes(config.method.toLowerCase())) {
     config.headers['X-CSRFToken'] = csrfToken;
   }
   return config;
 });
 
-// Функция для извлечения куки
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
