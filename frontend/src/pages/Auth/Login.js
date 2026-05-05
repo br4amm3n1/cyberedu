@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate, Navigate, useLocation } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { login, resendConfirmationEmail } from '../../api/auth';
 import { TextField, Button, Typography, Container, Box, Link } from '@mui/material';
 import { useFormik } from 'formik';
@@ -9,13 +9,11 @@ import { AuthContext } from '../../context/AuthContext';
 const Login = () => {
   const { handleLogin, isAuthenticated } = useContext(AuthContext); 
   const navigate = useNavigate();
-  const location = useLocation();
   const [error, setError] = useState('');
   const [errorType, setErrorType] = useState('');
   const [resendDisabled, setResendDisabled] = useState(false);
   const [countdown, setCountdown] = useState(60);
 
-  const from = location.state?.from || '/';
 
   const formik = useFormik({
     initialValues: {
@@ -72,10 +70,6 @@ const Login = () => {
       setError(err.message || 'Ошибка при отправке письма');
       setResendDisabled(false);
     }
-  };
-
-  if (isAuthenticated) {
-    return <Navigate to="/" replace />;
   };
 
   return (
