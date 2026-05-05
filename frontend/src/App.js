@@ -19,7 +19,6 @@ import SessionChecking from './components/SessionChecking';
 function App() {
   return (
     <BrowserRouter>
-      <SessionChecking>
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<Home />} />
@@ -39,7 +38,6 @@ function App() {
             <Route path="documents" element={<PrivateRoute><Documents /></PrivateRoute>} />
           </Route>
         </Routes>
-      </SessionChecking>
     </BrowserRouter>
   );
 }
