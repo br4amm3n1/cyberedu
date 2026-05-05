@@ -14,7 +14,6 @@ import EditProfile from './pages/Profile/EditProfile';
 import Documents from './pages/Documents/Documents';
 import AdminPanel from './pages/AdminPanel/AdminPanel';
 import ConfirmEmail from './pages/Auth/ConfirmEmail';
-import SessionChecking from './components/SessionChecking';
 
 function App() {
   return (
