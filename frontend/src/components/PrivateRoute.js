@@ -13,8 +13,6 @@ const PrivateRoute = ({ children }) => {
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   };
-
-  if (!user?.is_staff) return <Navigate to="/" />;
   
   return children;
 };
