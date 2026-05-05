@@ -1,9 +1,47 @@
 import React from 'react';
-import { RouterProvider } from 'react-router-dom';
-import { router } from './router';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Layout from './components/Layout';
+import Home from './pages/Home';
+import Login from './pages/Auth/Login';
+import Register from './pages/Auth/Register';
+import CourseList from './pages/Courses/CourseList';
+import CourseDetail from './pages/Courses/CourseDetail';
+import PrivateRoute from './components/PrivateRoute';
+import TestDetail from './pages/Courses/Tests/TestDetail';
+import TestsList from './pages/Courses/Tests/TestsList';
+import Profile from './pages/Profile/Profile';
+import EditProfile from './pages/Profile/EditProfile';
+import Documents from './pages/Documents/Documents';
+import AdminPanel from './pages/AdminPanel/AdminPanel';
+import ConfirmEmail from './pages/Auth/ConfirmEmail';
+import SessionChecking from './components/SessionChecking';
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <BrowserRouter>
+      <SessionChecking>
+        <Routes>
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Home />} />
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Register />} />
+            <Route path="confirm-email/:token" element={<ConfirmEmail />} />
+            <Route path="courses">
+              <Route index element={<PrivateRoute><CourseList /></PrivateRoute>} />
+              <Route path=":id" element={<PrivateRoute><CourseDetail /></PrivateRoute>}>
+                <Route path="tests" element={<PrivateRoute><TestsList /></PrivateRoute>} />
+              </Route>
+              <Route path=":id/tests/:testId" element={<PrivateRoute><TestDetail /></PrivateRoute>} />
+            </Route>
+            <Route path="profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
+            <Route path="profile/edit" element={<PrivateRoute><EditProfile /></PrivateRoute>} />
+            <Route path="admin-panel" element={<PrivateRoute> <AdminPanel /> </PrivateRoute>} />
+            <Route path="documents" element={<PrivateRoute><Documents /></PrivateRoute>} />
+          </Route>
+        </Routes>
+      </SessionChecking>
+    </BrowserRouter>
+  );
 }
 
 export default App;
