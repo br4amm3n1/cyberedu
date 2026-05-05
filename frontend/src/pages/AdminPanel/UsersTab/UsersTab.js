@@ -15,21 +15,17 @@ import { getProfiles, getBranchChoices } from '../../../api/auth';
 import { getAllCourses } from '../../../api/courses';
 
 const UsersTab = ({ onError, onSuccess }) => {
-  // Состояния для данных
   const [profiles, setProfiles] = useState([]);
   const [courses, setCourses] = useState([]);
   const [branchChoices, setBranchChoices] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Состояния для модальных окон
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [courseModalOpen, setCourseModalOpen] = useState(false);
   
-  // Выбранные пользователи и курсы
   const [selectedProfiles, setSelectedProfiles] = useState([]);
   const [selectedCoursesForBulk, setSelectedCoursesForBulk] = useState([]);
 
-  // Загрузка данных при монтировании
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -150,7 +146,6 @@ const UsersTab = ({ onError, onSuccess }) => {
 
   return (
     <Container maxWidth="xl" sx={{ py: 2 }}>
-      {/* Модальные окна */}
       <SelectionModal
         open={userModalOpen}
         onClose={handleCloseUserModal}
@@ -182,7 +177,6 @@ const UsersTab = ({ onError, onSuccess }) => {
         />
       </SelectionModal>
 
-      {/* Основной интерфейс */}
       <Grid container spacing={3} sx={{display: "grid", gridTemplateColumns: "1fr", width: "100%", mb: 3}}>
         <Grid item xs={12} md={6}>
           <SelectionCard
@@ -204,7 +198,6 @@ const UsersTab = ({ onError, onSuccess }) => {
         </Grid>
       </Grid>
 
-      {/* Кнопка назначения */}
       <Box sx={{ 
         display: 'flex', 
         justifyContent: 'center', 

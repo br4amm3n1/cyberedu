@@ -1,4 +1,3 @@
-// AdminPanel.js - упрощенная версия
 import React, { useState } from 'react';
 import { Box, Typography, Tabs, Tab } from '@mui/material';
 import UsersTab from './UsersTab/UsersTab';
