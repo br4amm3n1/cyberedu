@@ -5,12 +5,17 @@ import { AuthContext } from '../context/AuthContext';
 const SessionChecking = ({ children }) => {
     const { handleLogout, isAuthenticated } = useContext(AuthContext);
     const navigate = useNavigate();
+    const isRedirecting = useRef(false);
 
     useEffect(() => {
         const handleSessionExpired = () => {
-            if (isAuthenticated) {
+            if (isAuthenticated && !isRedirecting.current) {
+                isRedirecting.current = true;
                 handleLogout();
                 navigate('/login', { replace: true });
+                setTimeout(() => {
+                    isRedirecting.current = false;
+                }, 1000);
             }
         };
 
@@ -24,19 +29,27 @@ const SessionChecking = ({ children }) => {
     useEffect(() => {
         if (!isAuthenticated) return;
 
-        const checkInterval = setInterval(async () => {
-            try {
-                const { getCurrentUser } = await import('../api/auth');
-                await getCurrentUser();
-            } catch (error) {
-                if (error.response?.status === 401 || error.response?.status === 403) {
-                    handleLogout();
-                    navigate('/login', { replace: true });
-                }
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                import('../api/auth').then(({ getCurrentUser }) => {
+                    getCurrentUser().catch(async (error) => {
+                        if (error.response?.status === 401 || error.response?.status === 403) {
+                            if (!isRedirecting.current) {
+                                isRedirecting.current = true;
+                                await handleLogout();
+                                navigate('/login', { replace: true });
+                                setTimeout(() => {
+                                    isRedirecting.current = false;
+                                }, 1000);
+                            }
+                        }
+                    });
+                });
             }
-        }, 5 * 60 * 1000);
-
-        return () => clearInterval(checkInterval);
+        };
+        
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
     }, [isAuthenticated, handleLogout, navigate]);
 
     return children;
