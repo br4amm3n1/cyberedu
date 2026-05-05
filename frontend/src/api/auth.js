@@ -8,16 +8,6 @@ const api = axios.create({
 api.defaults.xsrfHeaderName = "X-CSRFToken";
 api.defaults.xsrfCookieName = "csrftoken";
 
-// api.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response?.status === 401 || error.response?.status === 403) {
-//       window.dispatchEvent(new CustomEvent('auth:unauthorized'));
-//     }
-//     return Promise.reject(error);
-//   }
-// );
-
 api.interceptors.request.use((config) => {
   const csrfToken = getCookie('csrftoken');
   if (csrfToken && ['post', 'put', 'patch', 'delete'].includes(config.method.toLowerCase())) {
@@ -25,6 +15,16 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      console.warn('Unauthorized request:', error.config?.url);
+    }
+    return Promise.reject(error);
+  }
+);
 
 function getCookie(name) {
   const value = `; ${document.cookie}`;

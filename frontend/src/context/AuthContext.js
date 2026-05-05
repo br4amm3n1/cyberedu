@@ -43,15 +43,24 @@ export const AuthProvider = ({ children }) => {
       }));
   };
 
-  const handleLogout = async () => {
+  const handleLogout = async (redirect = true) => {
+    try {
       await apiLogout();
-      setAuthState({
-        isAuthenticated: false,
-        user: null,
-        profile: null,
-        isLoading: false,
-      });
-    };
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+    
+    setAuthState({
+      isAuthenticated: false,
+      user: null,
+      profile: null,
+      isLoading: false,
+    });
+    
+    if (redirect && window.location.pathname !== '/login') {
+      window.location.href = '/login';
+    }
+  };
 
   const updateAuthState = (newData) => {
       setAuthState(prev => ({
@@ -68,7 +77,7 @@ export const AuthProvider = ({ children }) => {
         handleLogout,
         updateAuthState,
       }}>
-        {children}
+        {!authState.isLoading && children}
       </AuthContext.Provider>
     );
 };

@@ -8,10 +8,6 @@ import { AuthProvider } from './context/AuthContext';
 
 const theme = createTheme();
 
-// window.addEventListener('auth:unauthorized', () => {
-//   window.location.href = '/login';
-// });
-
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
