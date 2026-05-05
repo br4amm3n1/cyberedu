@@ -34,51 +34,65 @@ export const AuthProvider = ({ children }) => {
 
     useEffect(() => {
         loadUserData();
+    }, []);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (authState.isAuthenticated) {
+                getCurrentUser().catch(() => {
+                    setAuthState(prev => ({
+                        ...prev,
+                        isAuthenticated: false,
+                        user: null,
+                        profile: null,
+                    }));
+                });
+            }
+        }, 5 * 60 * 1000);
+        
+        return () => clearInterval(interval);
     }, [authState.isAuthenticated]);
 
-  const handleLogin = async () => {
-      setAuthState(prev => ({
-        ...prev,
-        isAuthenticated: true,
-      }));
-  };
+    const handleLogin = async () => {
+        await loadUserData();
+    };
 
-  const handleLogout = async (redirect = true) => {
-    try {
-      await apiLogout();
-    } catch (error) {
-      console.error('Logout error:', error);
-    }
-    
-    setAuthState({
-      isAuthenticated: false,
-      user: null,
-      profile: null,
-      isLoading: false,
-    });
-    
-    if (redirect && window.location.pathname !== '/login') {
-      window.location.href = '/login';
-    }
-  };
+    const handleLogout = async (redirect = true) => {
+        try {
+            await apiLogout();
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
 
-  const updateAuthState = (newData) => {
-      setAuthState(prev => ({
-          ...prev,
-          user: newData.user || prev.user,
-          profile: newData.profile || prev.profile,
-      }));
-  };
+        setAuthState({
+            isAuthenticated: false,
+            user: null,
+            profile: null,
+            isLoading: false,
+        });
 
-  return (
-      <AuthContext.Provider value={{
-        ...authState,
-        handleLogin,
-        handleLogout,
-        updateAuthState,
-      }}>
-        {!authState.isLoading && children}
-      </AuthContext.Provider>
+        if (redirect && window.location.pathname !== '/login') {
+            window.location.href = '/login';
+        }
+    };
+
+    const updateAuthState = (newData) => {
+        setAuthState(prev => ({
+            ...prev,
+            user: newData.user || prev.user,
+            profile: newData.profile || prev.profile,
+        }));
+    };
+
+    return (
+        <AuthContext.Provider value={{
+            ...authState,
+            handleLogin,
+            handleLogout,
+            updateAuthState,
+        }}>
+            {!authState.isLoading && children}
+        </AuthContext.Provider>
     );
 };
 

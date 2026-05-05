@@ -7,9 +7,8 @@ const Layout = () => {
     const { user, isAuthenticated, handleLogout } = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const handleLogoutClick = () => {
-        handleLogout();
-        navigate('/login', { replace: true });
+    const handleLogoutClick = async () => {
+        await handleLogout();
     };
 
     return (
