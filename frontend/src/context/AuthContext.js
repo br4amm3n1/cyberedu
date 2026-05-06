@@ -32,30 +32,30 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const verifySession = useCallback(async () => {
-        try {
-            const session = await checkSession();
-            
-            if (session.is_authenticated) {
-                if (!authState.user || authState.user.id !== session.user.id) {
-                    await loadUserData();
-                }
-            } else if (authState.isAuthenticated) {
-                handleLogout(false);
-            }
-        } catch (error) {
-            console.error('Ошибка при проверке сессии:', error);
-        }
-    }, [authState.isAuthenticated, loadUserData, handleLogout]);
-
     useEffect(() => {
         loadUserData();
     }, []);
 
     useEffect(() => {
+        const verifySession = async () => {
+            try {
+                const session = await checkSession();
+                
+                if (session.is_authenticated) {
+                    if (!authState.user || authState.user.id !== session.user.id) {
+                        await loadUserData();
+                    }
+                } else if (authState.isAuthenticated) {
+                    handleLogout(false);
+                }
+            } catch (error) {
+                console.error('Ошибка при проверке сессии:', error);
+            }
+        };
+
         const interval = setInterval(verifySession, 5 * 60 * 1000);
         return () => clearInterval(interval);
-    }, [verifySession]);
+    }, [authState.isAuthenticated]);
 
     const handleLogin = async () => {
         await loadUserData();
