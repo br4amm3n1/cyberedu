@@ -1,4 +1,3 @@
-# rabbitmq.py (или utils/rabbitmq.py)
 import pika
 import json
 from django.conf import settings
@@ -10,7 +9,7 @@ def get_rabbitmq_connection():
         host=settings.RABBITMQ_HOST,
         port=settings.RABBITMQ_PORT,
         credentials=credentials,
-        heartbeat=600,  # Важно для долгоживущих соединений
+        heartbeat=600,
         blocked_connection_timeout=300
     )
     return pika.BlockingConnection(parameters)
@@ -25,16 +24,14 @@ def publish_email_task(task_data):
         connection = get_rabbitmq_connection()
         channel = connection.channel()
 
-        # Объявляем очередь (убедимся, что она существует)
-        channel.queue_declare(queue=settings.RABBITMQ_QUEUE, durable=True) # durable=True сохранит задачи при перезагрузке RabbitMQ
+        channel.queue_declare(queue=settings.RABBITMQ_QUEUE, durable=True)
 
-        # Публикуем сообщение
         channel.basic_publish(
             exchange='',
             routing_key=settings.RABBITMQ_QUEUE,
-            body=json.dumps(task_data), # Сериализуем данные в JSON
+            body=json.dumps(task_data),
             properties=pika.BasicProperties(
-                delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE # Сохранит сообщение на диске
+                delivery_mode=pika.spec.PERSISTENT_DELIVERY_MODE
             )
         )
         print(f" [x] Sent task: {task_data}")

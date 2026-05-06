@@ -16,16 +16,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.status === 401 || error.response?.status === 403) {
-      console.warn('Unauthorized request:', error.config?.url);
-    }
-    return Promise.reject(error);
-  }
-);
-
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -123,6 +113,15 @@ export const updateProfileData = async (profileId, data) => {
 export const getBranchChoices = async () => {
     const response = await api.get(`branch-choices/`);
     return response.data.results || response.data;
+};
+
+export const checkSession = async () => {
+    try {
+        const response = await api.get('session-status/');
+        return response.data;
+    } catch (error) {
+        return { is_authenticated: false };
+    }
 };
 
 export default api;

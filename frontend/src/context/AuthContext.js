@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { logout as apiLogout, getCurrentUser } from '../api/auth';
+import { logout as apiLogout, getCurrentUser, checkSession } from '../api/auth';
 
 export const AuthContext = createContext();
 
@@ -32,26 +32,30 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const verifySession = useCallback(async () => {
+        try {
+            const session = await checkSession();
+            
+            if (session.is_authenticated) {
+                if (!authState.user || authState.user.id !== session.user.id) {
+                    await loadUserData();
+                }
+            } else if (authState.isAuthenticated) {
+                handleLogout(false);
+            }
+        } catch (error) {
+            console.error('Ошибка при проверке сессии:', error);
+        }
+    }, [authState.isAuthenticated, loadUserData, handleLogout]);
+
     useEffect(() => {
         loadUserData();
     }, []);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            if (authState.isAuthenticated) {
-                getCurrentUser().catch(() => {
-                    setAuthState(prev => ({
-                        ...prev,
-                        isAuthenticated: false,
-                        user: null,
-                        profile: null,
-                    }));
-                });
-            }
-        }, 5 * 60 * 1000);
-        
+        const interval = setInterval(verifySession, 5 * 60 * 1000);
         return () => clearInterval(interval);
-    }, [authState.isAuthenticated]);
+    }, [verifySession]);
 
     const handleLogin = async () => {
         await loadUserData();

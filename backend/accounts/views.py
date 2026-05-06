@@ -30,6 +30,24 @@ def confirm_email(request, token):
     profile.save()
     return Response({'info': 'Электронный почтовый адрес успешно подтвержден. Вход в вашу учетную запись был выполнен автоматически.'})
 
+
+class SessionStatusView(APIView): 
+    def get(self, request):
+        if request.user.is_authenticated:
+            return Response({
+                'is_authenticated': True,
+                'user': {
+                    'id': request.user.id,
+                    'username': request.user.username,
+                    'email': request.user.email,
+                    'is_staff': request.user.is_staff,
+                }
+            })
+        return Response({
+            'is_authenticated': False
+        }, status=200)
+
+
 class ResendConfirmationView(APIView):
     permission_classes = [permissions.AllowAny]
 
