@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback, useRef } from 'react';
 import { logout as apiLogout, getCurrentUser, checkSession } from '../api/auth';
 
 export const AuthContext = createContext();
@@ -11,7 +11,9 @@ export const AuthProvider = ({ children }) => {
         isLoading: true
     });
 
-    const loadUserData = async () => {
+    const authStateRef = useRef(authState);
+
+    const loadUserData = useCallback(async () => {
         try {
             const { profile } = await getCurrentUser();
             const user = profile.user;
@@ -30,38 +32,9 @@ export const AuthProvider = ({ children }) => {
                 isLoading: false
             });
         }
-    };
-
-    useEffect(() => {
-        loadUserData();
     }, []);
 
-    useEffect(() => {
-        const verifySession = async () => {
-            try {
-                const session = await checkSession();
-                
-                if (session.is_authenticated) {
-                    if (!authState.user || authState.user.id !== session.user.id) {
-                        await loadUserData();
-                    }
-                } else if (authState.isAuthenticated) {
-                    handleLogout(false);
-                }
-            } catch (error) {
-                console.error('Ошибка при проверке сессии:', error);
-            }
-        };
-
-        const interval = setInterval(verifySession, 5 * 60 * 1000);
-        return () => clearInterval(interval);
-    }, [authState.isAuthenticated]);
-
-    const handleLogin = async () => {
-        await loadUserData();
-    };
-
-    const handleLogout = async (redirect = true) => {
+    const handleLogout = useCallback(async (redirect = true) => {
         try {
             await apiLogout();
         } catch (error) {
@@ -78,6 +51,43 @@ export const AuthProvider = ({ children }) => {
         if (redirect && window.location.pathname !== '/login') {
             window.location.href = '/login';
         }
+    }, []);
+
+    useEffect(() => {
+        loadUserData();
+    }, [loadUserData]);
+
+    useEffect(() => {
+        authStateRef.current = authState;
+    }, [authState]);
+
+    useEffect(() => {
+        const verifySession = async () => {
+            const currentState = authStateRef.current;
+            
+            if (!currentState.isAuthenticated) return;
+            
+            try {
+                const session = await checkSession();
+                
+                if (session.is_authenticated) {
+                    if (!currentState.user || currentState.user.id !== session.user.id) {
+                        await loadUserData();
+                    }
+                } else {
+                    await handleLogout(false);
+                }
+            } catch (error) {
+                console.error('Ошибка проверки сессии:', error);
+            }
+        };
+
+        const interval = setInterval(verifySession, 5 * 60 * 1000);
+        return () => clearInterval(interval);
+    }, [loadUserData, handleLogout]);
+
+    const handleLogin = async () => {
+        await loadUserData();
     };
 
     const updateAuthState = (newData) => {
