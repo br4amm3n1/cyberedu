@@ -84,6 +84,8 @@ const EditProfile = () => {
         
         const { profile } = await getCurrentUser();
         const user = profile.user;
+        console.log(profile);
+        console.log(user)
 
         updateAuthState({
           user,
@@ -97,6 +99,7 @@ const EditProfile = () => {
         
       } catch (error) {
         setError('Ошибка обновления профиля');
+        console.log(error);
       } finally {
         setSaving(false);
         isSubmitting.current = false;
