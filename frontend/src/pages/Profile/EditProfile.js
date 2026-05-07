@@ -67,25 +67,28 @@ const EditProfile = () => {
       setSuccess(null);
 
       try {
+          console.log(user);
           await updateUserData(user.id, {
             first_name: values.first_name,
             last_name: values.last_name
           });
-
+          console.log(user);
           await new Promise(resolve => setTimeout(resolve, 100));
 
+          console.log(profile);
           await updateProfileData(profile.id, {
             position: values.position,
             department: values.department,
             branch: values.branch || null,
           });
+          console.log(profile);
         
         await new Promise(resolve => setTimeout(resolve, 100));
         
         const { profile } = await getCurrentUser();
         const user = profile.user;
         console.log(profile);
-        console.log(user)
+        console.log(user);
 
         updateAuthState({
           user,
