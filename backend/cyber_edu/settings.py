@@ -72,7 +72,6 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'cyber_edu.middleware.SessionStatusMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'corsheaders.middleware.CorsMiddleware',
