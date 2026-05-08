@@ -13,5 +13,4 @@ urlpatterns = [
     path('confirm-email/<str:token>/', views.confirm_email, name='confirm-email'),
     path('resend_confirmation/', views.ResendConfirmationView.as_view(), name='resend-confirmation'),
     path('branch-choices/', views.get_branch_choices, name='branch-choices'),
-    path('session-longpoll/', views.SessionLongPollView.as_view(), name='session-longpoll'),
 ] + router.urls
