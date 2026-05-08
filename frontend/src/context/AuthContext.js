@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    const handleLogout = useCallback(async (redirect = true) => {
+    const handleLogout = useCallback(async () => {
         try {
             await apiLogout();
         } catch (error) {
@@ -45,10 +45,6 @@ export const AuthProvider = ({ children }) => {
             profile: null,
             isLoading: false,
         });
-
-        if (redirect && window.location.pathname !== '/login') {
-            window.location.href = '/login';
-        }
     }, []);
 
     useEffect(() => {  
