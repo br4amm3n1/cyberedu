@@ -33,6 +33,46 @@ def confirm_email(request, token):
     profile.save()
     return Response({'info': 'Электронный почтовый адрес успешно подтвержден. Вход в вашу учетную запись был выполнен автоматически.'})
 
+class ResendConfirmationView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response(
+                {'error': 'Email is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            user = User.objects.get(email=email)
+            if user.profile.email_confirmed:
+                return Response(
+                    {'error': 'Email already confirmed'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            user.profile.email_confirmation_token = generate_confirmation_token()
+            user.profile.save()
+            
+            task_data = {
+                'user_id': user.id,
+                'action': 'confirmation'
+            }
+
+            publish_email_task(task_data)
+            # send_email(user, action='confirmation')
+            
+            return Response(
+                {'status': 'Confirmation email resent'},
+                status=status.HTTP_200_OK
+            )
+            
+        except User.DoesNotExist:
+            return Response(
+                {'error': 'User with this email not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
