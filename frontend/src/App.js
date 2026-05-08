@@ -15,11 +15,8 @@ import Documents from './pages/Documents/Documents';
 import AdminPanel from './pages/AdminPanel/AdminPanel';
 import ConfirmEmail from './pages/Auth/ConfirmEmail';
 import AdminRoute from './components/AdminRoute';
-import { useSessionSSE } from './context/hooks/useSessionSSE';
 
 function App() {
-  useSessionSSE();
-
   return (
     <BrowserRouter>
         <Routes>
