@@ -45,6 +45,7 @@ class SessionEventStreamView(APIView):
     SSE поток для отслеживания состояния сессии
     """
     permission_classes = [IsAuthenticated]
+    renderer_classes = []
     
     def get(self, request):
         user_id = request.user.id
