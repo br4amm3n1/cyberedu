@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useCallback, useRef } from 'react';
-import { logout as apiLogout, getCurrentUser, checkSession } from '../api/auth';
+import { logout as apiLogout, getCurrentUser } from '../api/auth';
 
 export const AuthContext = createContext();
 
@@ -10,8 +10,6 @@ export const AuthProvider = ({ children }) => {
         profile: null,
         isLoading: true
     });
-
-    const authStateRef = useRef(authState);
 
     const loadUserData = useCallback(async () => {
         try {
@@ -56,35 +54,6 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         loadUserData();
     }, [loadUserData]);
-
-    useEffect(() => {
-        authStateRef.current = authState;
-    }, [authState]);
-
-    useEffect(() => {
-        const verifySession = async () => {
-            const currentState = authStateRef.current;
-            
-            if (!currentState.isAuthenticated) return;
-            
-            try {
-                const session = await checkSession();
-                
-                if (session.is_authenticated) {
-                    if (!currentState.user || currentState.user.id !== session.user.id) {
-                        await loadUserData();
-                    }
-                } else {
-                    await handleLogout(false);
-                }
-            } catch (error) {
-                console.error('Ошибка проверки сессии:', error);
-            }
-        };
-
-        const interval = setInterval(verifySession, 5 * 60 * 1000);
-        return () => clearInterval(interval);
-    }, [loadUserData, handleLogout]);
 
     const handleLogin = async () => {
         await loadUserData();

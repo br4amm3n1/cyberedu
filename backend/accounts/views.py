@@ -1,12 +1,19 @@
+import json
+import time
+from threading import Thread
+import logging
 from rest_framework import viewsets, permissions, generics, status
 from rest_framework.exceptions import PermissionDenied
 from django.contrib.auth import authenticate, login, logout
 from django.db import connection 
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
+from django.http import StreamingHttpResponse
+from django.utils import timezone
 from .models import Profile
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import action, api_view, permission_classes
 from .serializers import (
     UserSerializer, ProfileSerializer, 
@@ -15,6 +22,8 @@ from .serializers import (
 )
 # from .services.email_service import send_email
 from accounts.rabbitmq import publish_email_task
+
+logger = logging.getLogger(__name__)
 
 
 @api_view(['GET'])
@@ -31,21 +40,78 @@ def confirm_email(request, token):
     return Response({'info': 'Электронный почтовый адрес успешно подтвержден. Вход в вашу учетную запись был выполнен автоматически.'})
 
 
-class SessionStatusView(APIView): 
+class SessionEventStreamView(APIView):
+    """
+    SSE поток для отслеживания состояния сессии
+    """
+    permission_classes = [IsAuthenticated]
+    
     def get(self, request):
-        if request.user.is_authenticated:
-            return Response({
-                'is_authenticated': True,
-                'user': {
-                    'id': request.user.id,
-                    'username': request.user.username,
-                    'email': request.user.email,
-                    'is_staff': request.user.is_staff,
-                }
-            })
-        return Response({
-            'is_authenticated': False
-        }, status=200)
+        user_id = request.user.id
+        session_key = request.session.session_key
+        start_time = time.time()
+        
+        def event_stream():
+            """Генератор событий"""
+            last_ping = time.time()
+            last_session_check = time.time()
+            
+            try:
+                while True:
+                    current_time = time.time()
+                    
+                    if current_time - last_ping >= 30:
+                        yield f"data: {json.dumps({'type': 'ping', 'timestamp': current_time})}\n\n"
+                        last_ping = current_time
+                    
+                    if current_time - last_session_check >= 2:
+                        from django.contrib.sessions.models import Session
+                        from django.contrib.auth import SESSION_KEY
+                        
+                        try:
+                            session = Session.objects.get(session_key=session_key)
+                            
+                            if session.expire_date < timezone.now():
+                                logger.info(f"Session {session_key} expired for user {user_id}")
+                                yield f"data: {json.dumps({'type': 'session_expired', 'reason': 'timeout'})}\n\n"
+                                break
+                            
+                            session_data = session.get_decoded()
+                            if SESSION_KEY not in session_data or session_data[SESSION_KEY] != user_id:
+                                logger.info(f"User {user_id} no longer in session {session_key}")
+                                yield f"data: {json.dumps({'type': 'session_expired', 'reason': 'logged_out'})}\n\n"
+                                break
+                                
+                        except Session.DoesNotExist:
+                            logger.info(f"Session {session_key} does not exist for user {user_id}")
+                            yield f"data: {json.dumps({'type': 'session_expired', 'reason': 'not_found'})}\n\n"
+                            break
+                        
+                        last_session_check = current_time
+                    
+                    if current_time - start_time >= 3600:
+                        yield f"data: {json.dumps({'type': 'connection_timeout'})}\n\n"
+                        break
+                    
+                    time.sleep(1)
+                    
+            except GeneratorExit:
+                logger.info(f"SSE connection closed for user {user_id}")
+            
+            yield f"data: {json.dumps({'type': 'connection_closed'})}\n\n"
+        
+        response = StreamingHttpResponse(
+            event_stream(),
+            content_type='text/event-stream',
+            status=200
+        )
+        
+        response['Cache-Control'] = 'no-cache'
+        response['X-Accel-Buffering'] = 'no'
+        response['Access-Control-Allow-Origin'] = '*'
+        response['Access-Control-Allow-Credentials'] = 'true'
+        
+        return response
 
 
 class ResendConfirmationView(APIView):
