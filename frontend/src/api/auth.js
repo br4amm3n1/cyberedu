@@ -16,6 +16,28 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+
+    const status = error.response?.status;
+
+    if (status === 401 || status === 403) {
+
+      const isLoginPage = window.location.pathname === '/login';
+
+      if (!isLoginPage) {
+
+        window.dispatchEvent(new CustomEvent('auth-expired'));
+
+        window.location.href = '/login';
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
@@ -113,15 +135,6 @@ export const updateProfileData = async (profileId, data) => {
 export const getBranchChoices = async () => {
     const response = await api.get(`branch-choices/`);
     return response.data.results || response.data;
-};
-
-export const checkSession = async () => {
-    try {
-        const response = await api.get('session-status/');
-        return response.data;
-    } catch (error) {
-        return { is_authenticated: false };
-    }
 };
 
 export default api;

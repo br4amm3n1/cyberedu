@@ -51,8 +51,23 @@ export const AuthProvider = ({ children }) => {
         }
     }, []);
 
-    useEffect(() => {
+    useEffect(() => {  
         loadUserData();
+
+        const handleAuthExpired = () => {
+            setAuthState({
+                isAuthenticated: false,
+                user: null,
+                profile: null,
+                isLoading: false,
+            });
+        };
+
+        window.addEventListener('auth-expired', handleAuthExpired);
+
+        return () => {
+            window.removeEventListener('auth-expired', handleAuthExpired);
+        };
     }, [loadUserData]);
 
     const handleLogin = async () => {
