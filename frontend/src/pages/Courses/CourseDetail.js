@@ -41,7 +41,6 @@ const CourseDetail = () => {
         setCourse(responseCourse.data);
         setCourseProgress(responseProgress.data || null);
       } catch (error) {
-        console.error('Error fetching course:', error);
         setError('Ошибка загрузки данных курса');
       } finally {
         setLoading(false);
@@ -103,7 +102,6 @@ const CourseDetail = () => {
         </Typography>
       </Box>
 
-      {/* Блок прогресса */}
       <Paper 
         elevation={2} 
         sx={{ 
@@ -191,7 +189,6 @@ const CourseDetail = () => {
         )}
       </Paper>
 
-      {/* Навигационные табы */}
       <Tabs 
         value={tabValue} 
         sx={{ 
@@ -218,7 +215,6 @@ const CourseDetail = () => {
         />
       </Tabs>
 
-      {/* Контент */}
       <Box>
         {tabValue === 0 && <MaterialsList courseId={id} />}
         <Outlet />

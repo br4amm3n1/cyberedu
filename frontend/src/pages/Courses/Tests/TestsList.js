@@ -35,11 +35,9 @@ const TestsList = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Сначала получаем информацию о курсе для проверки
         const courseResponse = await api.get(`courses/${id}/`);
         setCourseInfo(courseResponse.data);
 
-        // Затем получаем тесты только для этого курса
         const testsResponse = await api.get('tests/', {
           params: { 
             course_id: id,
@@ -47,7 +45,6 @@ const TestsList = () => {
           }
         });
 
-        // Дополнительная проверка на случай, если API вернет все тесты
         const filteredTests = testsResponse.data.results 
           ? testsResponse.data.results.filter(test => test.course == id)
           : testsResponse.data.filter(test => test.course == id);
@@ -72,7 +69,6 @@ const TestsList = () => {
 
       } catch (err) {
         setError(err.response?.data?.detail || 'Ошибка загрузки данных');
-        console.error('Error:', err);
       } finally {
         setLoading(false);
         setSubscriptionLoading(false);

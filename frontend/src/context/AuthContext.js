@@ -83,7 +83,7 @@ export const AuthProvider = ({ children }) => {
             ...authState,
             handleLogin,
             handleLogout,
-            updateAuthState,
+            updateAuthState
         }}>
             {!authState.isLoading && children}
         </AuthContext.Provider>

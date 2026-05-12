@@ -43,27 +43,26 @@ const Profile = () => {
 
   const loadCourses = async () => {
     try {
-        setLoadingCourses(true)
-        const response = await getUserProgressCourses();
+      setLoadingCourses(true)
+      const response = await getUserProgressCourses();
 
-        const data = response.data || [];
-        
-        if (user?.is_staff) {
-          const filteredData = data.filter(unit => {
-            return unit?.user?.id === user?.id;
-          });
+      const data = response.data || [];
+      
+      if (user?.is_staff) {
+        const filteredData = data.filter(unit => {
+          return unit?.user?.id === user?.id;
+        });
 
-          setCourses(filteredData);
+        setCourses(filteredData);
 
-        } else {
-          setCourses(data);
+      } else {
+        setCourses(data);
 
-        };
+      };
     } catch (error) {
-        setError('Failed to load courses');
-        console.error('Error loading courses:', error);
+      setError('Failed to load courses');
     } finally {
-        setLoadingCourses(false);
+      setLoadingCourses(false);
     }
   };
 

@@ -79,7 +79,6 @@ const CourseList = () => {
         }
         
       } catch (error) {
-        console.error('Error fetching courses:', error);
         setError('Ошибка загрузки');
       } finally {
         setLoading(false);
@@ -96,14 +95,12 @@ const CourseList = () => {
 
   useEffect(() => {
     if (searchTerm) {
-      // Фильтруем подписанные курсы по поисковому запросу
       const results = allCourses.filter(course =>
         subscribedCourseIds.includes(course.id) &&
         course.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredCourses(results);
     } else {
-      // Без поиска показываем все подписанные курсы
       const userCourses = allCourses.filter(course => 
         subscribedCourseIds.includes(course.id)
       );

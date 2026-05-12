@@ -18,20 +18,20 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
+
   (error) => {
 
     const status = error.response?.status;
 
-    if (status === 401 || status === 403) {
+    const isAuthExpired = status === 401 || status === 403;
 
-      const isLoginPage = window.location.pathname === '/login';
+    if (isAuthExpired) {
 
-      if (!isLoginPage) {
+      window.dispatchEvent(
+        new CustomEvent('auth-expired')
+      );
 
-        window.dispatchEvent(new CustomEvent('auth-expired'));
-
-        window.location.href = '/login';
-      }
+      return new Promise(() => {});
     }
 
     return Promise.reject(error);

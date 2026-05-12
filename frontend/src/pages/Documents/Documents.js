@@ -32,7 +32,6 @@ const Documents = () => {
                 setLoading(false);
             } catch (error) {
                 setError('Ошибка при загрузке документов');
-                console.error('Ошибка при загрузке документов:', error);
                 setLoading(false);
             } finally {
                 setLoading(false);
@@ -52,7 +51,6 @@ const Documents = () => {
           setError(null);
           const response = await downloadDocument(documentId);
           
-          // Создаем временную ссылку для скачивания
           const blobUrl = window.URL.createObjectURL(response.data);
           const link = document.createElement('a');
           link.href = blobUrl;

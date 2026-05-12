@@ -49,7 +49,6 @@ const TestDetail = () => {
         setOptions(optionsData);
       } catch (err) {
         setError(err.message || 'Ошибка загрузки данных');
-        console.error('Error loading test:', err);
       } finally {
         setLoading(false);
       }
@@ -58,13 +57,11 @@ const TestDetail = () => {
     fetchTestData();
   }, [id, testId]);
 
-  // Эффект для прокрутки страницы вверх при успешной отправке
   useEffect(() => {
     if (submitSuccess) {
-      // Прокручиваем страницу к верху
       window.scrollTo(0, 0);
     }
-  }, [submitSuccess]); // Срабатывает при изменении submitSuccess
+  }, [submitSuccess]);
 
   const handleOptionChange = (questionId, optionId, isMultiple) => {
     setUserAnswers(prev => {
