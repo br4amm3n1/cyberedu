@@ -16,6 +16,28 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+
+  (error) => {
+
+    const status = error.response?.status;
+
+    const isAuthExpired = status === 401 || status === 403;
+
+    if (isAuthExpired) {
+
+      window.dispatchEvent(
+        new CustomEvent('auth-expired')
+      );
+
+      error.isAuthError = true;
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 function getCookie(name) {
   const value = `; ${document.cookie}`;
   const parts = value.split(`; ${name}=`);
