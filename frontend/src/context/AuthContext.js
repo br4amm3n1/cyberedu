@@ -48,6 +48,8 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     useEffect(() => {  
+        loadUserData();
+
         const handleAuthExpired = () => {
             setAuthState({
                 isAuthenticated: false,
@@ -62,7 +64,7 @@ export const AuthProvider = ({ children }) => {
         return () => {
             window.removeEventListener('auth-expired', handleAuthExpired);
         };
-    }, []);
+    }, [loadUserData]);
 
     const handleLogin = async () => {
         await loadUserData();
