@@ -68,6 +68,7 @@ const TestsList = () => {
         setTestResults(results);
 
       } catch (err) {
+        if (err.isAuthError){ return; }
         setError(err.response?.data?.detail || 'Ошибка загрузки данных');
       } finally {
         setLoading(false);

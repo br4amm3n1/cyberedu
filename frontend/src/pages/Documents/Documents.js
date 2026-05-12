@@ -31,6 +31,7 @@ const Documents = () => {
                 setDocuments(response.data);
                 setLoading(false);
             } catch (error) {
+                if (error.isAuthError){ return; }
                 setError('Ошибка при загрузке документов');
                 setLoading(false);
             } finally {

@@ -41,6 +41,7 @@ const CourseDetail = () => {
         setCourse(responseCourse.data);
         setCourseProgress(responseProgress.data || null);
       } catch (error) {
+        if (error.isAuthError){ return; }
         setError('Ошибка загрузки данных курса');
       } finally {
         setLoading(false);

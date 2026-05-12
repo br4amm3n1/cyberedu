@@ -48,6 +48,7 @@ const TestDetail = () => {
         }
         setOptions(optionsData);
       } catch (err) {
+        if (err.isAuthError){ return; }
         setError(err.message || 'Ошибка загрузки данных');
       } finally {
         setLoading(false);

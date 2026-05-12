@@ -31,7 +31,7 @@ api.interceptors.response.use(
         new CustomEvent('auth-expired')
       );
 
-      return new Promise(() => {});
+      error.isAuthError = true;
     }
 
     return Promise.reject(error);
