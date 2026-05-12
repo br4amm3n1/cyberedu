@@ -100,7 +100,7 @@ export const getCurrentUser = async () => {
 export const getUsers = async () => {
     try {
         const response = await api.get('users/');
-        return response.data.results || response.data; // Обрабатываем оба формата ответа
+        return response.data.results || response.data;
     } catch (error) {
         console.error('Error fetching users:', error);
         throw error;
