@@ -79,6 +79,7 @@ const CourseList = () => {
         }
         
       } catch (error) {
+        if (error.isAuthError){ return; }
         setError('Ошибка загрузки');
       } finally {
         setLoading(false);

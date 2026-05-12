@@ -97,8 +97,8 @@ const EditProfile = () => {
         }, 1000);
         
       } catch (error) {
+        if (error.isAuthError){ return; }
         setError('Ошибка обновления профиля');
-        console.log(error);
       } finally {
         setSaving(false);
         isSubmitting.current = false;

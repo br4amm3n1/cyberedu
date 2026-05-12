@@ -60,7 +60,8 @@ const Profile = () => {
 
       };
     } catch (error) {
-      setError('Failed to load courses');
+      if (error.isAuthError){ return; }
+      setError('Ошибка при загрузке курсов');
     } finally {
       setLoadingCourses(false);
     }
