@@ -15,7 +15,6 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS(f" [x] Received {body}"))
             try:
                 task_data = json.loads(body)
-                # Вызываем функцию отправки письма
                 send_email_sync(
                     user_id=task_data.get('user_id'),
                     course_id=task_data.get('course_id'),
@@ -24,13 +23,9 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.SUCCESS(f" [x] Email task for user {task_data.get('user_id')} processed"))
             except Exception as e:
                 self.stdout.write(self.style.ERROR(f"Error processing task: {e}"))
-                # В случае ошибки сообщение НЕ подтверждается (ack) и может быть обработано снова
-                # Или можно настроить Dead Letter Exchange (DLX) для повторов
                 return
-            # Подтверждаем успешную обработку сообщения
             ch.basic_ack(delivery_tag=method.delivery_tag)
 
-        # Настраиваем подключение и начинаем слушать очередь
         connection = pika.BlockingConnection(
             pika.ConnectionParameters(
                 host=settings.RABBITMQ_HOST,
@@ -40,8 +35,7 @@ class Command(BaseCommand):
         )
         channel = connection.channel()
         channel.queue_declare(queue=settings.RABBITMQ_QUEUE, durable=True)
-
-        # Настраиваем QoS (качество обслуживания), чтобы не грузить воркер
+        
         channel.basic_qos(prefetch_count=1)
         channel.basic_consume(queue=settings.RABBITMQ_QUEUE, on_message_callback=callback)
 

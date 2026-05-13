@@ -1,4 +1,3 @@
-# tasks/email_tasks.py (Новый файл)
 from django.core.mail import send_mail
 from django.conf import settings
 from django.template.loader import render_to_string
@@ -29,7 +28,6 @@ def send_email_sync(user_id, course_id=None, action=None):
             course = Course.objects.get(id=course_id)
         except Course.DoesNotExist:
             print(f"Course with id {course_id} not found.")
-            # Решаем, продолжать ли отправку письма без курса
             return
 
     match action:
