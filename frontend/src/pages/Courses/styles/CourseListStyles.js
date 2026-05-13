@@ -12,7 +12,7 @@ export const StyledContainer = styled(Container)(({ theme }) => ({
 export const StyledGridContainer = styled(Grid)(({ theme }) => ({
   display: "grid",
   justifyContent: 'center',
-  marginTop: theme.spacing(4), // Добавлен отступ сверху
+  marginTop: theme.spacing(4),
   '& .MuiGrid-item': {
     paddingLeft: '0 !important',
     paddingRight: '0 !important'
@@ -31,9 +31,9 @@ export const StyledCard = styled(Card)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   textDecoration: 'none',
-  transition: 'box-shadow 0.3s ease-in-out', // Добавлена анимация
+  transition: 'box-shadow 0.3s ease-in-out',
   '&:hover': {
-    boxShadow: theme.shadows[6], // Усилен эффект при наведении
+    boxShadow: theme.shadows[6],
   }
 }));
 

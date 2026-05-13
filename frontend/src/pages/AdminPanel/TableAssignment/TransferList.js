@@ -33,10 +33,8 @@ export default function SelectAllTransferList({
 
   const hasBranchChoices = branchChoices && branchChoices.length > 0;
 
-  // Получаем размеры для текущего типа
   const cardSizes = styles.cardSizes[type] || styles.cardSizes.profile;
 
-  // Локальная фильтрация профилей по branch
   const filteredItems = useMemo(() => {
     if (type === 'profile' && hasBranchChoices && checkedBranches.length > 0) {
       return allItems.filter(item => {
@@ -49,7 +47,6 @@ export default function SelectAllTransferList({
     return allItems;
   }, [allItems, checkedBranches, type, hasBranchChoices]);
 
-  // Инициализация состояний
   useEffect(() => {
     const availableItems = filteredItems.filter(item => 
       !allSelected.some(selected => selected.id === item.id)

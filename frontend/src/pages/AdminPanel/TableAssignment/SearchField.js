@@ -12,7 +12,6 @@ const SearchField = ({
     
     useEffect(() => {
         setLocalItems(items);
-        // Также сбрасываем поиск, если items изменились
         if (searchTerm) {
             handleSearchInternal(searchTerm, items);
         }
@@ -35,7 +34,6 @@ const SearchField = ({
                        email.toLowerCase().includes(value.toLowerCase());
             };
 
-            // Для других типов
             if (item.title) return item.title.toLowerCase().includes(value.toLowerCase());
             if (item.name) return item.name.toLowerCase().includes(value.toLowerCase());
             
