@@ -4,7 +4,7 @@ services:
   nginx:
     build:
       context: .
-      dockerfile: nginx/Dockerfile
+      dockerfile: Dockerfile.nginx
     container_name: cyber_edu_nginx
     ports:
       - "192.168.1.66:80:80"
