@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Box, TextField } from "@mui/material";
 
 
@@ -8,16 +8,16 @@ const SearchField = ({
     placeholder = 'Поиск...'
 }) => {
     const [searchTerm, setSearchTerm] = useState('');
-    const [localItems, setLocalItems] = useState(items);
     
     useEffect(() => {
-        setLocalItems(items);
         if (searchTerm) {
             handleSearchInternal(searchTerm, items);
+        } else {
+            onSearchChange(items);
         }
-    }, [items]);
+    }, [searchTerm, handleSearchInternal, items, onSearchChange]);
 
-    const handleSearchInternal = (value, itemsToSearch) => {
+    const handleSearchInternal = useCallback((value, itemsToSearch) => {
         if (value.trim() === "") {
             onSearchChange(itemsToSearch);
             return;
@@ -41,12 +41,11 @@ const SearchField = ({
         });
 
         onSearchChange(results);
-    };
+    }, [onSearchChange]);
 
     const handleSearchChange = (e) => {
         const value = e.target.value;
         setSearchTerm(value);
-        handleSearchInternal(value, localItems);
     };
     
     return (
