@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { logout as apiLogout, getCurrentUser } from '../api/auth';
 
 export const AuthContext = createContext();

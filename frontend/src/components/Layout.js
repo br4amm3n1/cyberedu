@@ -1,11 +1,10 @@
 import { useContext } from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Outlet, Link } from 'react-router-dom';
 import { AppBar, Toolbar, Typography, Button, Container, Box } from '@mui/material';
 import { AuthContext } from '../context/AuthContext';
 
 const Layout = () => {
     const { user, isAuthenticated, handleLogout } = useContext(AuthContext);
-    const navigate = useNavigate();
 
     const handleLogoutClick = async () => {
         await handleLogout();
