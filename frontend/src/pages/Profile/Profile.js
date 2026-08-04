@@ -24,6 +24,7 @@ const Profile = () => {
   const { user, profile, handleLogout } = useContext(AuthContext)
   const [courses, setCourses] = useState([]);
   const [loadingCourses, setLoadingCourses] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const branchMapping = {
