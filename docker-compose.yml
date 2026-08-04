@@ -3,7 +3,7 @@ version: '3.8'
 services:
   nginx:
     build:
-      context: .
+      context: ../
       dockerfile: nginx/Dockerfile
     container_name: cyber_edu_nginx
     ports:
