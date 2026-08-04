@@ -1,8 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import { Container, Typography, 
-         Button, CircularProgress, 
-         Alert
+         CircularProgress, Alert
         } 
 from '@mui/material';
 import CheckCircle from '@mui/icons-material/CheckCircle';
@@ -92,7 +91,7 @@ const CourseList = () => {
       setLoading(false);
     }
 
-  }, [isAuthenticated]);
+  }, [isAuthenticated, user?.is_staff, user?.id]);
 
   useEffect(() => {
     if (searchTerm) {
