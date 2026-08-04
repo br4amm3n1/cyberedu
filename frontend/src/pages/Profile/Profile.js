@@ -15,7 +15,7 @@ import {
   Chip,
   CircularProgress,
 } from '@mui/material';
-import { Edit, Lock, Email, Work, Groups, CalendarToday, Business, BusinessCenterSharp } from '@mui/icons-material';
+import { Edit, Lock, Email, Work, Groups, CalendarToday, Business } from '@mui/icons-material';
 import { AuthContext } from '../../context/AuthContext';
 import { getUserProgressCourses } from '../../api/courses';
 import ProfileCoursesProgress from './ProfileCoursesProgress';
@@ -24,7 +24,6 @@ const Profile = () => {
   const { user, profile, handleLogout } = useContext(AuthContext)
   const [courses, setCourses] = useState([]);
   const [loadingCourses, setLoadingCourses] = useState(true);
-  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   const branchMapping = {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Paper, Pagination, Typography } from '@mui/material';
+import { Box, Pagination, Typography } from '@mui/material';
 import TestQuestion from './TestQuestion';
 
 const TestQuestionsList = ({ 

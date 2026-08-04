@@ -14,7 +14,7 @@ import {
 import { Save, Cancel } from '@mui/icons-material';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-import api, { 
+import { 
     getCurrentUser, 
     updateUserData, updateProfileData 
 } from '../../api/auth';

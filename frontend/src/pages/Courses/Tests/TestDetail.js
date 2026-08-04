@@ -121,7 +121,7 @@ const TestDetail = () => {
         });
       });
       
-      const response = await api.post(`tests/${testId}/submit/`, {
+      await api.post(`tests/${testId}/submit/`, {
         answers,
         course_id: id
       });
