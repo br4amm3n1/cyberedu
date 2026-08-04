@@ -9,14 +9,6 @@ const SearchField = ({
 }) => {
     const [searchTerm, setSearchTerm] = useState('');
     
-    useEffect(() => {
-        if (searchTerm) {
-            handleSearchInternal(searchTerm, items);
-        } else {
-            onSearchChange(items);
-        }
-    }, [searchTerm, handleSearchInternal, items, onSearchChange]);
-
     const handleSearchInternal = useCallback((value, itemsToSearch) => {
         if (value.trim() === "") {
             onSearchChange(itemsToSearch);
@@ -47,6 +39,14 @@ const SearchField = ({
         const value = e.target.value;
         setSearchTerm(value);
     };
+    
+    useEffect(() => {
+        if (searchTerm) {
+            handleSearchInternal(searchTerm, items);
+        } else {
+            onSearchChange(items);
+        }
+    }, [searchTerm, handleSearchInternal, items, onSearchChange]);
     
     return (
         <Box sx={{ p: 2 }}>
