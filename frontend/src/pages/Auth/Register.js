@@ -50,7 +50,8 @@ const Register = () => {
     onSubmit: async (values) => {
       try {
         const { password2, ...userData } = values;
-        const data = await register(userData);
+        await register(userData);
+
         setSuccess('Вы успешно зарегистрировались. Вам на почту отправлено письмо с подтверждением адреса электронной почты');
         setError('');
       } catch (err) {
@@ -68,17 +69,15 @@ const Register = () => {
     },
   });
 
-  // Автоматическое заполнение username на основе email
   useEffect(() => {
     if (formik.values.email) {
       const username = formik.values.email;
       formik.setFieldValue('username', username);
     }
-  }, [formik.values.email]);
+  }, [formik.values.email, formik.setFieldValue]);
 
   const handleNext = () => {
     if (activeStep === 0) {
-      // Проверка заполнения всех обязательных полей
       const requiredFields = ['email', 'first_name', 'last_name', 'department', 'position', 'branch'];
       const emptyFields = requiredFields.filter(field => !formik.values[field]);
       
@@ -90,14 +89,12 @@ const Register = () => {
         return;
       }
 
-      // Проверка валидности email (только формат)
       if (formik.errors.email) {
         formik.setFieldTouched('email', true);
         setError(formik.errors.email);
         return;
       }
 
-      // Проверка ошибок валидации для всех полей
       const fieldsWithErrors = requiredFields.filter(field => formik.errors[field]);
       if (fieldsWithErrors.length > 0) {
         fieldsWithErrors.forEach(field => {
@@ -107,7 +104,6 @@ const Register = () => {
         return;
       }
 
-      // Все проверки пройдены - переходим на следующий шаг
       setActiveStep(activeStep + 1);
       setError('');
     } else {
