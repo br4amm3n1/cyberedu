@@ -73,7 +73,7 @@ const Layout = () => {
                 </Toolbar>
             </AppBar>
 
-            <Container maxWidth="md" sx={{ mt: 4 }}>
+            <Container maxWidth="false" sx={{ mt: 4, px: { xs: 2, sm: 3, md: 4} }}>
                 <Outlet />
             </Container>
         </>
